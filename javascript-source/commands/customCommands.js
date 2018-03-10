@@ -4,7 +4,7 @@
         reCustomAPIJson = new RegExp(/\(customapijson ([\w\.:\/\$=\?\&\-]+)\s([\w\W]+)\)/), // URL[1], JSONmatch[2..n]
         reCustomAPITextTag = new RegExp(/{([\w\W]+)}/),
         reCommandTag = new RegExp(/\(command\s([\w]+)\)/),
-        tagCheck = new RegExp(/\(age\)|\(sender\)|\(@sender\)|\(baresender\)|\(random\)|\(1\)|\(count\)|\(pointname\)|\(currenttime|\(price\)|\(#|\(uptime\)|\(follows\)|\(game\)|\(status\)|\(touser\)|\(echo\)|\(alert [,.\w]+\)|\(readfile|\(1=|\(countdown=|\(downtime\)|\(paycom\)|\(onlineonly\)|\(offlineonly\)|\(code=|\(followage\)|\(gameinfo\)|\(titleinfo\)|\(gameonly=|\(playtime\)|\(gamesplayed\)|\(pointtouser\)|\(lasttip\)|\(writefile .+\)|\(readfilerand|\(commandcostlist\)|\(playsound |\(customapi |\(customapijson /),
+        tagCheck = new RegExp(/\(subscribers\)|\(age\)|\(sender\)|\(@sender\)|\(baresender\)|\(random\)|\(1\)|\(2\)|\(3\)|\(count\)|\(pointname\)|\(currenttime|\(price\)|\(#|\(uptime\)|\(follows\)|\(game\)|\(status\)|\(touser\)|\(echo\)|\(alert [,.\w]+\)|\(readfile|\(1=|\(countdown=|\(downtime\)|\(paycom\)|\(onlineonly\)|\(offlineonly\)|\(code=|\(followage\)|\(gameinfo\)|\(titleinfo\)|\(gameonly=|\(playtime\)|\(gamesplayed\)|\(pointtouser\)|\(lasttip\)|\(writefile .+\)|\(readfilerand|\(commandcostlist\)|\(playsound |\(customapi |\(customapijson /),
         customCommands = [],
         ScriptEventManager = Packages.tv.phantombot.script.ScriptEventManager,
         CommandEvent = Packages.tv.phantombot.event.command.CommandEvent;
@@ -31,7 +31,7 @@
             ScriptEventManager.instance().onEvent(new CommandEvent(username, command, args, tags));
         } else {
             ScriptEventManager.instance().onEvent(new CommandEvent(username, command, args));
-        }  
+        }
     }
 
     /*
@@ -63,6 +63,21 @@
         if (atEnabled && event.getArgs()[0] !== undefined && $.isModv3(event.getSender(), event.getTags())) {
             if (!message.match(tagCheck)) {
                 return event.getArgs()[0] + ' -> ' + message;
+            }
+        }
+
+        if (message.match(/\(readfile/)) {
+            if (message.search(/\((readfile ([^)]+)\))/g) >= 0) {
+                message = $.replace(message, '(' + RegExp.$1, $.readFile('./addons/' + RegExp.$2)[0]);
+            }
+        }
+
+        if (message.match(/\(readfilerand/)) {
+            if (message.search(/\((readfilerand ([^)]+)\))/g) >= 0) {
+                var path = RegExp.$2;
+                var path2 = RegExp.$1;
+                var results = $.arrayShuffle($.readFile('./addons/' + path.trim()));
+                message = $.replace(message, '(' + path2.trim(), $.randElement(results));
             }
         }
 
@@ -128,9 +143,10 @@
         }
 
         if (message.match(/\(countdown=[^)]+\)/g)) {
-            var t = message.match(/\([^)]+\)/)[0], countdown, time;
+            var t = message.match(/\([^)]+\)/)[0],
+                countdown, time;
             countdown = t.replace('(countdown=', '').replace(')', '');
-            time = (Date.parse(countdown) - Date.parse(new Date()));
+            time = (Date.parse(countdown) - Date.parse($.getLocalTime()));
             message = $.replace(message, t, $.getTimeString(time / 1000));
         }
 
@@ -156,16 +172,6 @@
                 return null;
             }
             message = $.replace(message, '(offlineonly)', '');
-        }
-
-        if (message.match(/\(gameonly=[^)]+\)/g)) {
-            var t = message.match(/\([^)]+\)/)[0],
-                game = t.replace('(gameonly=', '').replace(')', '');
-
-            if (!$.getGame($.channelName).equalsIgnoreCase(game)) {
-                return null;
-            }
-            message = $.replace(message, t, '');
         }
 
         if (message.match(/\(sender\)/g)) {
@@ -257,35 +263,20 @@
         if (message.match(/\(code=/g)) {
             var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
                 length = message.substr(6).replace(')', '');
-                text = '',
+            text = '',
                 i;
 
             for (i = 0; i < length; i++) {
                 text += code.charAt(Math.floor(Math.random() * code.length));
             }
-            message = $.replace(message, '(code=' + length +')', String(text));
+            message = $.replace(message, '(code=' + length + ')', String(text));
         }
 
         if (message.match(/\(alert [,.\w]+\)/g)) {
             var filename = message.match(/\(alert ([,.\w]+)\)/)[1];
             $.panelsocketserver.alertImage(filename);
-            message = message.replaceFirst('\\(alert [,.\\w]+\\)', '');
+            message = (message + '').replace(/\(alert [,.\w]+\)/, '');
             if (message == '') return null;
-        }
-
-        if (message.match(/\(readfile/)) {
-            if (message.search(/\((readfile ([^)]+)\))/g) >= 0) {
-                message = $.replace(message, '(' + RegExp.$1, $.readFile('./addons/' + RegExp.$2)[0]);
-            }
-        }
-
-        if (message.match(/\(readfilerand/)) {
-            if (message.search(/\((readfilerand ([^)]+)\))/g) >= 0) {
-                var path = RegExp.$2;
-                var path2 = RegExp.$1;
-                var results = $.arrayShuffle($.readFile('./addons/' + path.trim()));
-                message = $.replace(message, '(' + path2.trim(), $.randElement(results));
-            }
         }
 
         if (message.match(/\(gameinfo\)/)) {
@@ -309,10 +300,12 @@
         }
 
         if (message.match(/\(followage\)/g)) {
-            var args = event.getArgs(), channel = $.channelName, sender = event.getSender();
-            
-            if (args.length > 0) sender = args[0];
-            if (args.length > 1) channel = args[1];
+            var args = event.getArgs(),
+                channel = $.channelName,
+                sender = event.getSender();
+
+            if (args.length > 0) sender = args[0].replace('@','');
+            if (args.length > 1) channel = args[1].replace('@','');
 
             $.getFollowAge(event.getSender(), sender, channel);
             return null;
@@ -347,12 +340,22 @@
             message = $.replace(message, message.match(/\(playsound\s([a-zA-Z1-9_]+)\)/)[0], '');
             if (message == '') {
                 return null;
-            }     
+            }
         }
 
         if (message.match(/\(age\)/g)) {
             $.getChannelAge(event);
             return null;
+        }
+
+        if (message.match(/\(math (.*)\)/)) {
+            var mathStr = message.match(/\(math (.*)\)/)[1].replace(/\s/g, '');
+
+            if (mathStr.length === 0) {
+                return null;
+            }
+
+            message = $.replace(message, message.match(/\(math (.*)\)/)[0], String(eval(mathStr)));
         }
 
         if (message.match(/\(writefile .+\)/)) {
@@ -372,15 +375,14 @@
             var m = message.match(/\(encodeurl ([\w\W]+)\)/);
             message = $.replace(message, m[0], encodeURI(m[1]));
         }
-
-        if (message.match(/\(math (.*)\)/)) {
-            var mathStr = message.match(/\(math (.*)\)/)[1].replace(/\s/g, '');
-
-            if (mathStr.length === 0) {
+        
+        if (message.match(/\(gameonly=.*\)/g)) {
+            var game = message.match(/\(gameonly=(.*)\)/)[1];
+ 
+            if (!$.getGame($.channelName).equalsIgnoreCase(game)) {
                 return null;
             }
-
-            message = $.replace(message, message.match(/\(math (.*)\)/)[0], String(eval(mathStr)));
+            message = $.replace(message, message.match(/(\(gameonly=.*\))/)[1], '');
         }
 
         if (message.match(reCustomAPIJson) || message.match(reCustomAPI) || message.match(reCommandTag)) {
@@ -464,61 +466,42 @@
                     jsonCheckList = jsonItems[j].split('.');
                     if (jsonCheckList.length == 1) {
                         try {
-                            customAPIResponse = new JSONObject(origCustomAPIResponse).getString(jsonCheckList[0]);
+                            customAPIResponse = new JSONObject(origCustomAPIResponse).get(jsonCheckList[0]);
                         } catch (ex) {
-                            if (ex.message.indexOf('not a string') != -1) {
-                                try {
-                                    customAPIResponse = new JSONObject(origCustomAPIResponse).getInt(jsonCheckList[0]);
-                                } catch (ex) {
-                                    return $.lang.get('customcommands.customapijson.err', command);
-                                }
-                            } else {
-                                return $.lang.get('customcommands.customapijson.err', command);
-                            }
+                            $.log.error('Failed to get data from API: ' + ex.message);
+                            return $.lang.get('customcommands.customapijson.err', command);
                         }
                         customAPIReturnString += " " + customAPIResponse;
                     } else {
                         for (var i = 0; i < jsonCheckList.length - 1; i++) {
                             if (i == 0) {
                                 try {
-                                    jsonObject = new JSONObject(origCustomAPIResponse).getJSONObject(jsonCheckList[i]);
+                                    jsonObject = new JSONObject(origCustomAPIResponse).get(jsonCheckList[i]);
                                 } catch (ex) {
-                                    try {
-                                        jsonObject = new JSONArray(origCustomAPIResponse).get(jsonCheckList[i]);
-                                    } catch (ex) {
-                                        return $.lang.get('customcommands.customapijson.err', command);
-                                    }
+                                    $.log.error('Failed to get data from API: ' + ex.message);
+                                    return $.lang.get('customcommands.customapijson.err', command);
                                 }
                             } else if (!isNaN(jsonCheckList[i + 1])) {
                                 try {
-                                    jsonObject = jsonObject.getJSONArray(jsonCheckList[i]);
+                                    jsonObject = jsonObject.get(jsonCheckList[i]);
                                 } catch (ex) {
-                                    try {
-                                        jsonObject = jsonObject.getJSONObject(jsonCheckList[i]);
-                                    } catch (ex) {
-                                        return $.lang.get('customcommands.customapijson.err', command);
-                                    }
+                                    $.log.error('Failed to get data from API: ' + ex.message);
+                                    return $.lang.get('customcommands.customapijson.err', command);
                                 }
                             } else {
                                 try {
-                                    jsonObject = jsonObject.getJSONObject(jsonCheckList[i]);
+                                    jsonObject = jsonObject.get(jsonCheckList[i]);
                                 } catch (ex) {
+                                    $.log.error('Failed to get data from API: ' + ex.message);
                                     return $.lang.get('customcommands.customapijson.err', command);
                                 }
                             }
                         }
                         try {
-                            customAPIResponse = jsonObject.getString(jsonCheckList[i]);
+                            customAPIResponse = jsonObject.get(jsonCheckList[i]);
                         } catch (ex) {
-                            if (ex.message.indexOf('not a string') != -1) {
-                                try {
-                                    customAPIResponse = jsonObject.getInt(jsonCheckList[i]);
-                                } catch (ex) {
-                                    return $.lang.get('customcommands.customapijson.err', command);
-                                }
-                            } else {
-                                return $.lang.get('customcommands.customapijson.err', command);
-                            }
+                            $.log.error('Failed to get data from API: ' + ex.message);
+                            return $.lang.get('customcommands.customapijson.err', command);
                         }
                         customAPIReturnString += " " + customAPIResponse;
                     }
@@ -549,24 +532,22 @@
      * @returns 0 = good, 1 = command perm bad, 2 = subcommand perm bad
      */
     function permCom(username, command, subcommand) {
-        if ($.isAdmin(username)) {
-            return 0;
-        }
         if (subcommand === '') {
             if ($.getCommandGroup(command) >= $.getUserGroupId(username)) {
                 return 0;
             } else {
                 return 1;
             }
-        }
-        if ($.getSubcommandGroup(command, subcommand) >= $.getUserGroupId(username)) {
-            return 0;
         } else {
-            return 2;
+            if ($.getSubcommandGroup(command, subcommand) >= $.getUserGroupId(username)) {
+                return 0;
+            } else {
+                return 2;
+            }
         }
-    }  
+    }
 
-     /*
+    /*
      * @function priceCom
      *
      * @export $
@@ -574,23 +555,29 @@
      * @param {string} command
      * @param {sub} subcommand
      * @param {bool} isMod
-     * @returns 1 | 0
+     * @returns 1 | 0 - Not a boolean
      */
     function priceCom(username, command, subCommand, isMod) {
-        if ($.inidb.exists('pricecom', (command + ' ' + subCommand).trim())) {
+        if ((subCommand !== '' && $.inidb.exists('pricecom', command + ' ' + subCommand)) || $.inidb.exists('pricecom', command)) {
             if ((((isMod && $.getIniDbBoolean('settings', 'pricecomMods', false) && !$.isBot(username)) || !isMod)) && $.bot.isModuleEnabled('./systems/pointSystem.js')) {
-                var cost = getCommandPrice(command, subCommand, '');
-                
-                if ($.getUserPoints(username) < cost) {
+                if ($.getUserPoints(username) < getCommandPrice(command, subCommand, '')) {
                     return 1;
-                } else {
-                    $.inidb.decr('points', username, cost);
                 }
+                return 0;
             }
-        } else if ($.inidb.exists('paycom', command)) {
-            $.inidb.incr('points', username, $.inidb.get('paycom', command));
         }
-        return 0;
+        return -1;
+    }
+
+    /*
+     * @function payCom
+     *
+     * @export $
+     * @param {string} command
+     * @returns 1 | 0 - Not a boolean
+     */
+    function payCom(command) {
+        return ($.inidb.exists('paycom', command) ? 0 : 1);
     }
 
     /*
@@ -607,11 +594,22 @@
         subCommand = subCommand.toLowerCase();
         subCommandAction = subCommandAction.toLowerCase();
         return parseInt($.inidb.exists('pricecom', command + ' ' + subCommand + ' ' + subCommandAction) ?
-                            $.inidb.get('pricecom', command + ' ' + subCommand + ' ' + subCommandAction) :
-                                $.inidb.exists('pricecom', command + ' ' + subCommand) ?
-                                    $.inidb.get('pricecom', command + ' ' + subCommand) :
-                                        $.inidb.exists('pricecom', command) ?
-                                            $.inidb.get('pricecom', command) : 0);
+            $.inidb.get('pricecom', command + ' ' + subCommand + ' ' + subCommandAction) :
+            $.inidb.exists('pricecom', command + ' ' + subCommand) ?
+            $.inidb.get('pricecom', command + ' ' + subCommand) :
+            $.inidb.exists('pricecom', command) ?
+            $.inidb.get('pricecom', command) : 0);
+    }
+
+    /*
+     * @function getCommandPay
+     *
+     * @export $
+     * @param {string} command
+     * @returns {Number}
+     */
+    function getCommandPay(command) {
+        return ($.inidb.exists('paycom', command) ? $.inidb.get('paycom', command) : 0);
     }
 
     /*
@@ -662,7 +660,7 @@
          */
         if (customCommands[command] !== undefined) {
             var tag = tags(event, customCommands[command], true);
-            if (tag !== null) {               
+            if (tag !== null) {
                 $.say(tag);
             }
             return;
@@ -712,11 +710,11 @@
             if (action === undefined || subAction === undefined) {
                 $.say($.whisperPrefix(sender) + $.lang.get('customcommands.edit.usage'));
                 return;
-            } 
+            }
 
             action = action.replace('!', '').toLowerCase();
             argsString = args.slice(1).join(' ');
-            
+
             if (!$.commandExists(action)) {
                 $.say($.whisperPrefix(sender) + $.lang.get('cmd.404', action));
                 return;
@@ -775,9 +773,12 @@
             action = action.replace('!', '').toLowerCase();
             subAction = args.slice(1).join(' ').replace('!', '').toLowerCase();
 
-            if (!$.commandExists(subAction.split(' ')[0])) {
+            if ($.commandExists(action)) {
+                $.say($.whisperPrefix(sender) + $.lang.get('customcommands.alias.error.exists'));
+                return;
+            } else if (!$.commandExists(subAction.split(' ')[0])) {
                 $.say($.whisperPrefix(sender) + $.lang.get('customcommands.alias.error.target404'));
-                return
+                return;
             } else if ($.inidb.exists('aliases', action)) {
                 $.say($.whisperPrefix(sender) + $.lang.get('customcommands.alias.error', action));
                 return;
@@ -843,21 +844,21 @@
                     if (list[i].equalsIgnoreCase(action)) {
                         $.inidb.set('permcom', $.inidb.get('aliases', list[i]), group);
                         $.updateCommandGroup($.inidb.get('aliases', list[i]), group);
-                    } 
+                    }
                 }
 
                 $.inidb.set('permcom', action, group);
                 $.updateCommandGroup(action, group);
             } else {
                 group = args[2];
-    
+
                 if (!$.subCommandExists(action, subAction)) {
                     $.say($.whisperPrefix(sender) + $.lang.get('customcommands.set.perm.404', action + ' ' + subAction));
                     return;
                 } else if (isNaN(parseInt(group))) {
                     group = $.getGroupIdByName(group);
                 }
-    
+
                 $.say($.whisperPrefix(sender) + $.lang.get('customcommands.set.perm.success', action + ' ' + subAction, $.getGroupNameById(group)));
                 $.inidb.set('permcom', action + ' ' + subAction, group);
                 $.updateSubcommandGroup(action, subAction, group);
@@ -886,22 +887,22 @@
                     $.say($.whisperPrefix(sender) + $.lang.get('customcommands.set.price.error.invalid'));
                     return;
                 }
-    
+
                 $.say($.whisperPrefix(sender) + $.lang.get('customcommands.set.price.success', action, subAction, $.pointNameMultiple));
                 $.inidb.set('pricecom', action, subAction);
 
                 var list = $.inidb.GetKeyList('aliases', ''),
                     i;
-    
+
                 for (i in list) {
                     if (list[i].equalsIgnoreCase(action)) {
                         $.inidb.set('pricecom', $.inidb.get('aliases', list[i]), parseInt(subAction));
-                    } 
+                    }
                     if ($.inidb.get('aliases', list[i]).includes(action)) {
                         $.inidb.set('pricecom', list[i], parseInt(subAction));
                     }
                 }
-            } else if (args.length === 3) { 
+            } else if (args.length === 3) {
                 if (isNaN(parseInt(args[2])) || parseInt(args[2]) < 0) {
                     $.say($.whisperPrefix(sender) + $.lang.get('customcommands.set.price.error.invalid'));
                     return;
@@ -915,7 +916,7 @@
                         $.say($.whisperPrefix(sender) + $.lang.get('customcommands.set.price.error.invalid'));
                         return;
                     }
-    
+
                     $.say($.whisperPrefix(sender) + $.lang.get('customcommands.set.price.success', action + ' ' + subAction + ' ' + args[2], args[3], $.pointNameMultiple));
                     $.inidb.set('pricecom', action + ' ' + subAction + ' ' + args[2], args[3]);
                 }
@@ -1014,7 +1015,7 @@
             } else if (!isNaN(action)) {
                 totalPages = $.paginateArray(cmdList, 'customcommands.botcommands', ', ', true, sender, parseInt(action));
                 return;
-            } 
+            }
             $.say($.whisperPrefix(sender) + $.lang.get('customcommands.botcommands.error'));
             return;
         }
@@ -1065,6 +1066,22 @@
             $.registerChatCommand(($.inidb.exists('tempDisabledCommandScript', action) ? $.inidb.get('tempDisabledCommandScript', action) : './commands/customCommands.js'), action);
             return;
         }
+
+        /*
+         * @commandpath resetcom [command] - Resets the counter to zero, for a command that uses the (count) tag
+         */
+        if (command.equalsIgnoreCase('resetcom')) {
+            if (action === undefined) {
+                $.say($.whisperPrefix(sender) + $.lang.get('customcommands.reset.usage'));
+                return;
+            }
+
+            action = action.replace('!', '').toLowerCase();
+
+            $.say($.whisperPrefix(sender) + $.lang.get('customcommands.reset.success', action));
+            $.inidb.del('commandCount', action);
+            return;
+        }
     });
 
     /*
@@ -1083,8 +1100,9 @@
         $.registerChatCommand('./commands/customCommands.js', 'disablecom', 1);
         $.registerChatCommand('./commands/customCommands.js', 'enablecom', 1);
         $.registerChatCommand('./commands/customCommands.js', 'botcommands', 2);
+        $.registerChatCommand('./commands/customCommands.js', 'resetcom', 2);
     });
-    
+
     /*
      * @event webPanelSocketUpdate
      */
@@ -1112,7 +1130,7 @@
     });
 
     /*
-     * Export functions to API 
+     * Export functions to API
      */
     $.addComRegisterCommands = addComRegisterCommands;
     $.addComRegisterAliases = addComRegisterAliases;
@@ -1121,6 +1139,8 @@
     $.priceCom = priceCom;
     $.getCommandPrice = getCommandPrice;
     $.tags = tags;
+    $.getCommandPay = getCommandPay;
+    $.payCom = payCom;
     $.command = {
         run: runCommand
     };

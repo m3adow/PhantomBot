@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ import sx.blah.discord.api.internal.ShardImpl;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.ClientBuilder;
 
-import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
-import sx.blah.discord.handle.impl.events.UserLeaveEvent;
-import sx.blah.discord.handle.impl.events.UserJoinEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.member.UserLeaveEvent;
+import sx.blah.discord.handle.impl.events.guild.member.UserJoinEvent;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
@@ -35,18 +35,24 @@ import sx.blah.discord.handle.obj.IUser;
 
 import sx.blah.discord.util.DiscordException;
 
+import tv.phantombot.event.discord.channel.DiscordChannelCommandEvent;
+import tv.phantombot.event.discord.channel.DiscordChannelMessageEvent;
+import tv.phantombot.event.discord.channel.DiscordChannelJoinEvent;
+import tv.phantombot.event.discord.channel.DiscordChannelPartEvent;
+import tv.phantombot.event.EventBus;
+
 /*
  * Communicates with the Discord API.
  *
- * @author Illusionaryone
+ * @author IllusionaryOne
  * @author ScaniaTV
  */
 public class DiscordAPI extends DiscordUtil {
     private static final DiscordAPI instance = new DiscordAPI();
-    public static IDiscordClient client;
-    public static ShardImpl shard;
-    public static IGuild guild;
-    
+    private static IDiscordClient client;
+    private static ShardImpl shard;
+    private static IGuild guild;
+
     /*
      * Method to return this class object.
      *
@@ -61,7 +67,7 @@ public class DiscordAPI extends DiscordUtil {
      */
     private DiscordAPI() {
         Configuration.LOAD_EXTERNAL_MODULES = false;
-        
+
         Thread.setDefaultUncaughtExceptionHandler(com.gmt2001.UncaughtExceptionHandler.instance());
     }
 
@@ -72,19 +78,63 @@ public class DiscordAPI extends DiscordUtil {
      */
     public void connect(String token) {
         try {
-            DiscordAPI.client = new ClientBuilder().withToken(token).registerListener(new DiscordEventListener()).login();
+            DiscordAPI.client = new ClientBuilder().withToken(token).setMaxReconnectAttempts(50).setDaemon(false).registerListener(new DiscordEventListener()).login();
         } catch (DiscordException ex) {
             com.gmt2001.Console.err.println("Failed to authenticate with Discord: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
         }
     }
 
     /*
+     * Method to reconnect to Discord.
+     */
+    public void reconnect() {
+        try {
+            DiscordAPI.client.logout();
+            DiscordAPI.client.login();
+        } catch (DiscordException ex) {
+            com.gmt2001.Console.err.println("Failed to authenticate with Discord: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
+        }
+    }
+
+    /*
+     * Method that will return the current shard.
+     *
+     * @return {ShardImpl}
+     */
+    public static ShardImpl getShard() {
+        return shard;
+    }
+
+    /*
+     * Method that will return the current guild.
+     *
+     * @return {IGuild}
+     */
+    public static IGuild getGuild() {
+        return guild;
+    }
+
+    /*
+     * Method that will return the current guild
+     *
+     * @return {IDiscordClient}
+     */
+    public static IDiscordClient getClient() {
+        return client;
+    }
+
+    /*
      * Method to set the guild and shard objects.
      */
     private void setGuildAndShard() {
-        // The bot should only be in one server, so this should be fine.
-        DiscordAPI.guild = DiscordAPI.client.getGuilds().get(0);
-        DiscordAPI.shard = (ShardImpl) DiscordAPI.client.getShards().get(0);
+        // PhantomBot only works in one server, so throw an error if there's multiple.
+        if (DiscordAPI.getClient().getGuilds().size() > 1) {
+            com.gmt2001.Console.err.println("Discord bot account connected to multiple servers. Now disconnecting from Discord...");
+            DiscordAPI.client.logout();
+        } else {
+            DiscordAPI.guild = DiscordAPI.getClient().getGuilds().get(0);
+            DiscordAPI.shard = (ShardImpl) DiscordAPI.getClient().getShards().get(0);
+        }
     }
 
     /*
@@ -102,8 +152,7 @@ public class DiscordAPI extends DiscordUtil {
             arguments = commandString.substring(commandString.indexOf(" ") + 1);
         }
 
-        //TODO: Update the discord event classes to work with Discord4J.
-        //EventBus.instance().post(new DiscordCommandEvent(user, channel, command, arguments, isAdmin));
+        EventBus.instance().postAsync(new DiscordChannelCommandEvent(user, channel, command, arguments, isAdmin));
     }
 
     /*
@@ -127,27 +176,24 @@ public class DiscordAPI extends DiscordUtil {
             String message = iMessage.getContent();
             String channel = iChannel.getName();
             boolean isAdmin = isAdministrator(iUsername);
-            
+
             com.gmt2001.Console.out.println("[DISCORD] [#" + channel + "] " + username + ": " + message);
 
             if (message.startsWith("!")) {
                 parseCommand(iUsername, iChannel, message, isAdmin);
             }
 
-            //TODO: Update the discord event classes to work with Discord4J.
-            //EventBus.instance().post(new DiscordMessageEvent(iUsername, iChannel, iMessage, isAdmin));
+            EventBus.instance().postAsync(new DiscordChannelMessageEvent(iUsername, iChannel, iMessage, isAdmin));
         }
 
         @EventSubscriber
         public void onDiscordUserJoinEvent(UserJoinEvent event) {
-            //TODO: Update the discord event classes to work with Discord4J.
-            //EventBus.instance().post(new DiscordJoinEvent(event.getUser()));
+            EventBus.instance().postAsync(new DiscordChannelJoinEvent(event.getUser()));
         }
 
         @EventSubscriber
         public void onDiscordUserLeaveEvent(UserLeaveEvent event) {
-            //TODO: Update the discord event classes to work with Discord4J.
-            //EventBus.instance().post(new DiscordLeaveEvent(event.getUser()));
+            EventBus.instance().postAsync(new DiscordChannelPartEvent(event.getUser()));
         }
     }
 }

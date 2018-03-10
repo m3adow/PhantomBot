@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ import java.io.BufferedReader;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
+import org.joda.time.DateTime;
+
 import tv.phantombot.PhantomBot;
 
 /*
@@ -34,107 +36,118 @@ import tv.phantombot.PhantomBot;
  */
 public class GenerateLogs {
 
-	/*
-	 * Method that will write the latest errors to one file.
-	 */
-	public static void writeLogs() {
-		com.gmt2001.Console.out.println("Generating latest error logs...");
+    /*
+     * Method that will write the latest errors to one file.
+     */
+    public static void writeLogs() {
+        com.gmt2001.Console.out.println("Generating latest error logs...");
 
-		String logData = "";
+        String logData = "";
 
-		logData += readFile("logs/error/" + getDate(false) + ".txt");
-		logData += readFile("logs/core-error/" + getDate(true) + ".txt");
+        // Need to clean this up later.
+        logData += PhantomBot.instance().getBotInformation() + "\r\n";
+        logData += readFile("logs/error/" + getDate(false, true) + ".txt");
+        logData += readFile("logs/core-error/" + getDate(true, true) + ".txt");
+        logData += readFile("logs/error/" + getDate(false, false) + ".txt");
+        logData += readFile("logs/core-error/" + getDate(true, false) + ".txt");
 
-		String fileName = ("errors_" + getDate(false) + "@" + System.currentTimeMillis() + ".txt");
+        String fileName = ("errors_" + getDate(false, false) + "@" + System.currentTimeMillis() + ".txt");
 
-		com.gmt2001.Console.out.println("Log file \"" + fileName + "\" was created in the main bot folder.");
+        com.gmt2001.Console.out.println("Log file \"" + fileName + "\" was created in the main bot folder.");
 
-		writeToFile(fileName, logData);
-	}
+        writeToFile(fileName, logData);
+    }
 
-	/*
-	 * Method that will print the latest errors in the console.
-	 */
-	public static void printLogs() {
-		com.gmt2001.Console.out.println("Generating latest error logs...");
+    /*
+     * Method that will print the latest errors in the console.
+     */
+    public static void printLogs() {
+        com.gmt2001.Console.out.println("Generating latest error logs...");
 
-		String logData = "";
+        String logData = "";
 
-		logData += readFile("logs/error/" + getDate(false) + ".txt");
-		logData += readFile("logs/core-error/" + getDate(true) + ".txt");
+        // Need to clean this up later.
+        logData += PhantomBot.instance().getBotInformation() + "\r\n";
+        logData += readFile("logs/error/" + getDate(false, false) + ".txt");
+        logData += readFile("logs/core-error/" + getDate(true, false) + ".txt");
+        logData += readFile("logs/error/" + getDate(false, true) + ".txt");
+        logData += readFile("logs/core-error/" + getDate(true, true) + ".txt");
 
-		com.gmt2001.Console.out.println(logData);
-	}
+        com.gmt2001.Console.out.println(logData);
+    }
 
-	/*
-	 * Method that will read the log files.
-	 *
-	 * @param  {String} file
-	 * @return {String}
-	 */
-	private static String readFile(String file) {
-		BufferedReader bufferedReader = null;
-		String data = "";
-		String line = "";
+    /*
+     * Method that will read the log files.
+     *
+     * @param  {String} file
+     * @return {String}
+     */
+    private static String readFile(String file) {
+        BufferedReader bufferedReader = null;
+        String data = "----" + file + "----\r\n";
+        String line = "";
 
-		try {
-			if (new File(file).exists()) {
-				bufferedReader = new BufferedReader(new FileReader(file));
-		
-				while ((line = bufferedReader.readLine()) != null) {
-					data += (line + "\r\n");
-				}
-			}
-		} catch (IOException ex) {
-			com.gmt2001.Console.err.println("Failed to read log file: [" + file + "] [IOException] " + ex.getMessage());
-		} finally {
-			if (bufferedReader != null) {
-				try {
-					bufferedReader.close();
-				} catch (IOException ex) {
-					com.gmt2001.Console.err.printStackTrace(ex);
-				}
-			}
-		}
+        try {
+            if (new File(file).exists()) {
+                bufferedReader = new BufferedReader(new FileReader(file));
 
-		return data;
-	}
+                while ((line = bufferedReader.readLine()) != null) {
+                    data += (line + "\r\n");
+                }
+            }
+        } catch (IOException ex) {
+            com.gmt2001.Console.err.println("Failed to read log file: [" + file + "] [IOException] " + ex.getMessage());
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException ex) {
+                    com.gmt2001.Console.err.printStackTrace(ex);
+                }
+            }
+        }
 
-	/*
-	 * Method used to write the log data to a file in the main bot folder.
-	 *
-	 * @param {String} file
-	 * @param {String} data
-	 */
-	private static void writeToFile(String file, String data) {
-		BufferedWriter bufferedWriter = null;
+        return data;
+    }
 
-		try {
-			bufferedWriter = new BufferedWriter(new FileWriter(file));
+    /*
+     * Method used to write the log data to a file in the main bot folder.
+     *
+     * @param {String} file
+     * @param {String} data
+     */
+    private static void writeToFile(String file, String data) {
+        BufferedWriter bufferedWriter = null;
 
-			bufferedWriter.write(data);
-		} catch (IOException ex) {
-			com.gmt2001.Console.err.println("Failed to write log file: [" + file + "] [IOException] " + ex.getMessage());
-		} finally {
-			if (bufferedWriter != null) {
-				try {
-					bufferedWriter.close();
-				} catch (IOException ex) {
-					com.gmt2001.Console.err.printStackTrace(ex);
-				}
-			}
-		}
-	}
+        try {
+            bufferedWriter = new BufferedWriter(new FileWriter(file));
 
-	/*
-	 * Method to get the current date of log files.
-	 *
-	 * @return {String}
-	 */
-	private static String getDate(boolean isGMT) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            bufferedWriter.write(data);
+            bufferedWriter.flush();
+        } catch (IOException ex) {
+            com.gmt2001.Console.err.println("Failed to write log file: [" + file + "] [IOException] " + ex.getMessage());
+        } finally {
+            if (bufferedWriter != null) {
+                try {
+                    bufferedWriter.close();
+                } catch (IOException ex) {
+                    com.gmt2001.Console.err.printStackTrace(ex);
+                }
+            }
+        }
+    }
 
-		dateFormat.setTimeZone(java.util.TimeZone.getTimeZone((isGMT ? "GMT" : PhantomBot.timeZone)));
-        return dateFormat.format(new Date());
-	}
+    /*
+     * Method to get the current date of log files.
+     *
+     * @param  {Boolean} isGMT
+     * @param  {Boolean} minusDay
+     * @return {String}
+     */
+    private static String getDate(boolean isGMT, boolean minusDay) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+        dateFormat.setTimeZone(java.util.TimeZone.getTimeZone((isGMT ? "GMT" : PhantomBot.timeZone)));
+        return (!minusDay ? dateFormat.format(new Date()) : dateFormat.format(new DateTime(new Date()).minusDays(1).toDate()));
+    }
 }

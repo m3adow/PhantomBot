@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
 package tv.phantombot.event.twitch.follower;
 
 import tv.phantombot.event.twitch.TwitchEvent;
-import tv.phantombot.twitchwsirc.Channel;
 
 public class TwitchFollowsInitializedEvent extends TwitchEvent {
 
+    /*
+     * Class constructor.
+     */
     public TwitchFollowsInitializedEvent() {
-    }
 
-    public TwitchFollowsInitializedEvent(Channel channel) {
-        super(channel);
     }
 }

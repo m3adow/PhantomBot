@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,7 @@
 package tv.phantombot.event.tipeeestream;
 
 import tv.phantombot.event.Event;
-import tv.phantombot.twitchwsirc.Channel;
 
-public class TipeeeStreamEvent extends Event {
+public abstract class TipeeeStreamEvent extends Event {
 
-    private final Channel channel;
-
-    public TipeeeStreamEvent() {
-        this.channel = null;
-    }
-
-    public TipeeeStreamEvent(Channel channel) {
-        this.channel = channel;
-    }
-
-    public Channel getChannel() {
-        return this.channel;
-    }
 }

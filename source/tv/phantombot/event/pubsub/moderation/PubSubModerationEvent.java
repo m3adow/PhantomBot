@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,29 +14,52 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package tv.phantombot.event.pubsub;
+package tv.phantombot.event.pubsub.moderation;
 
-public class PubSubModerationEvent extends PubSubEvent {
+import tv.phantombot.event.pubsub.PubSubEvent;
 
-	private final String username;
-	private final String creator;
-	private final String message;
+public abstract class PubSubModerationEvent extends PubSubEvent {
+    private final String username;
+    private final String creator;
+    private final String message;
 
-	protected PubSubModerationEvent(String username, String creator, String message) {
-		this.username = username;
-		this.creator = creator;
-		this.message = message;
-	}
+    /*
+     * Abstract constructor.
+     *
+     * @param {String} username
+     * @param {String} creator
+     * @param {String} message
+     */
+    protected PubSubModerationEvent(String username, String creator, String message) {
+        this.username = username;
+        this.creator = creator;
+        this.message = message;
+    }
 
-	public String getUsername() {
-		return this.username;
-	}
+    /*
+     * Method that returns the username that the even was triggered for.
+     *
+     * @return {String} username
+     */
+    public String getUsername() {
+        return this.username;
+    }
 
-	public String getCreator() {
-		return this.creator;
-	}
+    /*
+     * Method that returns the creator for the event.
+     *
+     * @return {String} creator
+     */
+    public String getCreator() {
+        return this.creator;
+    }
 
-	public String getMessage() {
-		return this.message;
-	}
+    /*
+     * Method that returns the message of the creator if one is given.
+     *
+     * @return {String} message
+     */
+    public String getMessage() {
+        return this.message;
+    }
 }

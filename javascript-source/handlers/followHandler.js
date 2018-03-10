@@ -18,7 +18,7 @@
         followQueue = new java.util.concurrent.ConcurrentLinkedQueue,
         lastFollow = $.systemTime(),
         announceFollows = false;
-        
+
     /*
      * @function updateFollowConfig
      */
@@ -73,7 +73,7 @@
             if (followReward > 0) {
                 $.inidb.incr('points', follower, followReward);
             }
-            
+
             $.writeToFile(follower + ' ', './addons/followHandler/latestFollower.txt', false);
             $.inidb.set('streamInfo', 'lastFollow', follower);
         }
@@ -148,7 +148,7 @@
                 return;
             }
 
-            action = action.toLowerCase();
+            action = $.user.sanitize(action);
 
             if ($.user.isFollower(action)) {
                 $.say($.lang.get('followhandler.check.follows', $.username.resolve(action)));
@@ -166,19 +166,20 @@
                 return;
             }
 
-            var streamer = $.username.resolve(args[0]),
+            var streamer = $.user.sanitize(args[0]),
+                streamerDisplay = $.username.resolve(streamer),
                 streamerGame = $.getGame(streamer),
                 streamerURL = 'https://twitch.tv/' + streamer;
 
             if (streamerGame == null || streamerGame.length === 0) {
-                $.say($.lang.get('followhandler.shoutout.no.game', streamer, streamerURL));
+                $.say($.lang.get('followhandler.shoutout.no.game', streamerDisplay, streamerURL));
                 return;
             }
 
             if (!$.isOnline(streamer)) {
-                $.say($.lang.get('followhandler.shoutout.offline', streamer, streamerURL, streamerGame));
-            } else{
-                $.say($.lang.get('followhandler.shoutout.online', streamer, streamerURL, streamerGame));
+                $.say($.lang.get('followhandler.shoutout.offline', streamerDisplay, streamerURL, streamerGame));
+            } else {
+                $.say($.lang.get('followhandler.shoutout.online', streamerDisplay, streamerURL, streamerGame));
             }
         }
     });
@@ -194,7 +195,7 @@
         $.registerChatCommand('./handlers/followHandler.js', 'checkfollow', 2);
         $.registerChatCommand('./handlers/followHandler.js', 'shoutout', 2);
 
-        setInterval(function() { runFollows(); }, 2e3, 'scripts::discord::core::accountLink.js');
+        setInterval(runFollows, 2e3, 'scripts::handlers::followHandler.js');
     });
 
     $.updateFollowConfig = updateFollowConfig;

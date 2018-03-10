@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,6 +90,29 @@ public class HTTPServerCommon {
         }
     }
 
+    public static void handleBetaPanel(HttpExchange exchange) throws IOException {
+        URI uriData = exchange.getRequestURI();
+        String uriPath = uriData.getPath();
+
+        // Get the Request Method (GET/PUT)
+        String requestMethod = exchange.getRequestMethod();
+
+        // Get any data from the body, although, we just discard it, this is required
+        InputStream inputStream = exchange.getRequestBody();
+        while (inputStream.read() != -1) {
+            inputStream.skip(0x10000);
+        }
+        inputStream.close();
+
+        if (requestMethod.equals("GET")) {
+            if (uriPath.equals("/beta-panel")) {
+                HTTPServerCommon.handleFile("/web/beta-panel/index.html", exchange, false, false);
+            } else {
+                HTTPServerCommon.handleFile("/web/" + uriPath, exchange, false, false);
+            }
+        }
+    }
+
     public static void handle(HttpExchange exchange, String serverPassword, String serverWebAuth) throws IOException {
         Boolean hasPassword = false;
         Boolean doRefresh = false;
@@ -140,6 +163,8 @@ public class HTTPServerCommon {
         }
         if (headers.containsKey("message")) {
             myHdrMessage = headers.getFirst("message");
+            byte[] myHdrMessageBytes = myHdrMessage.getBytes(StandardCharsets.ISO_8859_1);
+            myHdrMessage = new String(myHdrMessageBytes, StandardCharsets.UTF_8);
         }
 
         // Check the uriQueryList for the webauth
@@ -311,7 +336,7 @@ public class HTTPServerCommon {
                     jsonObject.object().key("table");
                     jsonObject.object();
                     jsonObject.key("table_name").value(dbTable);
-                    jsonObject.key("key").value(keyValue[0]);
+                    jsonObject.key("key").value(keyValue[1]);
                     jsonObject.key("value").value(dbString);
                     jsonObject.endObject();
                     jsonObject.endObject();
@@ -346,7 +371,7 @@ public class HTTPServerCommon {
                 return;
             }
 
-            // getAllRows and getSortedRows return data in the following format:  
+            // getAllRows and getSortedRows return data in the following format:
             // { "table" : { "table_name": "tableName", "results" : [ "key" : "keyString", "value" : "valueString" ] } }
             if (keyValue[0].equals("getAllRows") || keyValue[0].equals("getSortedRows") || keyValue[0].equals("getSortedRowsByValue")) {
 
@@ -354,7 +379,7 @@ public class HTTPServerCommon {
                 String sortOrder = "DESC";
                 String sortLimit = String.valueOf(Integer.MAX_VALUE);
                 String sortOffset = "0";
-              
+
                 String[] dbKeys = null;
                 jsonObject.object();
                 jsonObject.key("table");
@@ -411,7 +436,7 @@ public class HTTPServerCommon {
             }
 
         }
-       
+
         jsonObject.object().key("error").value("malformed request").endObject();
         sendHTMLError(400, jsonObject.toString(), exchange);
         return;
@@ -481,7 +506,7 @@ public class HTTPServerCommon {
 
                 if (doMarquee) {
                     refreshString = "<html><head><meta http-equiv=\"refresh\" content=\"5\" /><style>" +
-                                    "body { margin: 5px; }" + 
+                                    "body { margin: 5px; }" +
                                     ".marquee { "+
                                     "    height: 25px;" +
                                     "    width: " + marqueeWidth + "px;" +
@@ -512,7 +537,7 @@ public class HTTPServerCommon {
                     refreshString = "<html><head><meta http-equiv=\"refresh\" content=\"5\" /></head>" +
                                     "<body>" + fileStringData + "</body></html>";
                 }
-                
+
                 sendData("text/html", refreshString, exchange);
             } catch (FileNotFoundException ex) {
                 sendHTMLError(404, "Not Found", exchange);
@@ -577,7 +602,9 @@ public class HTTPServerCommon {
 
     private static void sendData(String contentType, byte[] data, HttpExchange exchange) {
         Headers outHeaders = exchange.getResponseHeaders();
-        outHeaders.set("Content-Type", contentType);
+        // Send as UTF-8 if the contentType is a text file.
+        outHeaders.set("Content-Type", contentType + (contentType.indexOf("text") != -1 ? "; charset=UTF-8" : ""));
+
         try {
             exchange.sendResponseHeaders(200, data.length);
             OutputStream outputStream = exchange.getResponseBody();

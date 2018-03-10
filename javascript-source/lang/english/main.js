@@ -1,7 +1,7 @@
 $.lang.register('chatmoderator.moderation.logs', 'Moderation logs have been $1');
 $.lang.register('chatmoderator.moderation.enabled', 'Enabled - this will require a bot reboot.');
 $.lang.register('chatmoderator.usage.toggles', 'Usage: !moderation [links / caps / symbols / spam / emotes / colors / longmessages / spamtracker / fakepurge / regulars / subscribers / silenttimeout]');
-$.lang.register('chatmoderator.usage.messages', 'Usage: !moderation [linksmessage / capsmessage / symbolsmessage / spammessage / emotesmessage / colorsmessage / blacklistmessage / longmsgmessage / spamtrackermessage / fakepurgemessage]');
+$.lang.register('chatmoderator.usage.messages', 'Usage: !moderation [linksmessage / capsmessage / symbolsmessage / spammessage / emotesmessage / colorsmessage / blacklistmessage / blacklistmessageban / longmsgmessage / spamtrackermessage / fakepurgemessage]');
 $.lang.register('chatmoderator.options', 'Usage: !moderation [capstriggerlength / capslimit / symbolstriggerlength / symbolslimit / symbolsgrouplimit / spamlimit / emoteslimit / spamtrackerlimit / spamtrackertime / permittime / warningtime / timeouttime / messagecooldown / messagecharacterlimit / warningresettime]');
 $.lang.register('chatmoderator.link.usage', 'Usage: !moderation links [on / off] (link filter is currently $1)');
 $.lang.register('chatmoderator.fakepurge.usage', 'Usage: !moderation fakepurge [on / off] (fake purge is currently $1)');
@@ -143,6 +143,8 @@ $.lang.register('chatmoderator.fakepurge.message.usage', 'Usage: !moderation fak
 $.lang.register('chatmoderator.fakepurge.message.set', 'fake purge warning message set to: $1');
 $.lang.register('chatmoderator.blacklist.message.usage', 'Usage: !moderation blacklistmessage [message]');
 $.lang.register('chatmoderator.blacklist.message.set', 'blacklist warning message set to: $1');
+$.lang.register('chatmoderator.blacklistban.message.usage', 'Usage: !moderation blacklistmessageban [message]');
+$.lang.register('chatmoderator.blacklistban.message.set', 'blacklist ban message set to: $1');
 $.lang.register('chatmoderator.permit.time.usage', 'Usage: !moderation permittime [time]');
 $.lang.register('chatmoderator.permit.time.set', 'link permit time set to: $1 seconds.');
 $.lang.register('chatmoderator.caps.limit.usage', 'Usage: !moderation capslimit [amount in percent]');
@@ -179,6 +181,7 @@ $.lang.register('chatmoderator.whitelist.remove.usage', 'Usage: !whiteList remov
 $.lang.register('chatmoderator.whitelist.removed', 'Link removed from the whitelist!');
 $.lang.register('chatmoderator.warning', '(warning)');
 $.lang.register('chatmoderator.timeout', '(timeout)');
+$.lang.register('chatmoderator.ban', '(ban)');
 $.lang.register('chatmoderator.blacklisttimeouttime.set', 'blacklist timeout time set to $1 seconds.');
 $.lang.register('chatmoderator.blacklisttimeouttime.usage', '!moderation blacklisttimeouttime [time in seconds] (blacklist timeout time is currently $1 seconds)');
 $.lang.register('chatmoderator.warningtime.usage', '!moderation warningtime [links / caps / symbols / spam / emotes / colors / longmessages / spamtracker / fakepurge] [time in seconds]');
@@ -238,6 +241,7 @@ $.lang.register('common.enabled', 'enabled');
 $.lang.register('common.user-error', 'You must specify a user to target with this command');
 $.lang.register('common.user.404', 'The user "$1" has not visited this channel yet.');
 $.lang.register('common.game.change', 'Changed the current game to: $1!');
+$.lang.register('common.communities.change', 'Communities have been updated!');
 $.lang.register('common.title.change', 'Changed the current title to: $1!');
 $.lang.register('common.twitch.no.status', 'not sure, neither is Twitch');
 $.lang.register('common.twitch.no.game', 'not sure, neither is Twitch');
@@ -255,6 +259,7 @@ $.lang.register('console.received.subscriberonly.end', 'Received an end subscrib
 $.lang.register('console.received.subscriberonly.start', 'Received a start subscribers-only mode notification from jtv');
 $.lang.register('cooldown.set.togglemodcooldown', 'Command cooldowns have been $1 for moderators.');
 $.lang.register('cooldown.coolcom.usage', 'Usage: !coolcom [command] [seconds] [type (global / user)] - Using -1 for the seconds removes the cooldown.');
+$.lang.register('cooldown.coolcom.err', 'The minimum cooldown that can be set is 5 seconds.');
 $.lang.register('cooldown.coolcom.set', 'Cooldown for command !$1 has been set to $2 seconds.');
 $.lang.register('cooldown.coolcom.remove', 'Cooldown for command !$1 has been removed.');
 $.lang.register('cooldown.cooldown.usage', 'Usage: !cooldown [togglemoderators / setdefault]');
@@ -378,3 +383,14 @@ $.lang.register('common.get.age.days', '$1 $2 has been on Twitch since $3. (Join
 $.lang.register('common.get.age', '$1 $2 has been on Twitch since $3.');
 $.lang.register('channel.age.user.404', 'That user is not on Twitch.');
 $.lang.register('main.donation.last.tip.message', 'Last tip from: $1 ($2 $3)');
+$.lang.register('common.time.month', 'month');
+$.lang.register('common.time.months', 'months');
+$.lang.register('common.time.day', 'day');
+$.lang.register('common.time.days', 'days');
+$.lang.register('common.time.hour', 'hour');
+$.lang.register('common.time.hours', 'hours');
+$.lang.register('common.time.minute', 'minute');
+$.lang.register('common.time.minutes', 'minutes');
+$.lang.register('common.time.second', 'second');
+$.lang.register('common.time.seconds', 'seconds');
+$.lang.register('common.time.and', ', and ');

@@ -5,27 +5,28 @@
  [![Build Status](https://travis-ci.org/PhantomBot/PhantomBot.svg?branch=master)](https://travis-ci.org/PhantomBot/PhantomBot) 
  [<img src="https://discordapp.com/api/guilds/107910097937682432/widget.png?style=shield">](https://discord.gg/Xdh5SRY)
 
-[**PhantomBot**](https://phantombot.tv) is a Twitch chat bot powered by Java. PhantomBot has many modern features out of the box such as a built-in webpanel, enhanced moderation, games, a point system, raffles, custom commands, a music player, [and more](https://phantombot.tv/features)! PhantomBot can also be integrated with many services such as [Discord](https://discordapp.com/), [Twitter](https://twitter.com), [GameWisp](https://gamewisp.com), [StreamTip](https://streamtip.com), [TipeeeStream](https://tipeeestream.com) and [StreamLabs](https://streamlabs.com)!
+[**PhantomBot**](https://phantombot.tv) is a Twitch chat bot powered by Java. PhantomBot has many modern features out of the box such as a built-in webpanel, enhanced moderation, games, a point system, raffles, custom commands, a music player, [and more](https://phantombot.tv/features)! PhantomBot can also be integrated with many services such as [Discord](https://discordapp.com/), [Twitter](https://twitter.com), [GameWisp](https://gamewisp.com), [StreamTip](https://streamtip.com), [TipeeeStream](https://tipeeestream.com), [StreamLabs](https://streamlabs.com) and [StreamElements](https://streamelements.com)!
 
 Additional functionality is enabled through the use of third-party modules.
 
 * [Get PhantomBot](https://phantombot.tv/ "PhantomBot")
 * [Full Feature List](https://phantombot.tv/features "PhantomBot Features")
-* [Community Forums](https://community.phantombot.tv)
-* [Documentation & Installation Instructions](https://docs.phantombot.tv)
-* [PhantomBot Blog](https://blog.phantombot.tv)
+* [Community Forums](https://community.phantombot.tv "PhantomBot Community Forums")
+* [Documentation & Installation Instructions](https://docs.phantombot.tv "Documenation and Installation Instructions")
+* [PhantomBot Blog](https://blog.phantombot.tv "PhantomBot Blog")
 * [Follow us on Twitter](https://www.twitter.com/PhantomBotApp "PhantomBot Twitter")
 
 ## Screenshots
-
-[![](https://i.zelakto.tv/cbD6vV7.png)](https://i.zelakto.tv/OmvE0rY.png)
-[![](https://i.zelakto.tv/l3WNPWK.png)](https://i.zelakto.tv/6h38mvL.png)
-[![](https://i.zelakto.tv/xGoRGJs.png)](https://i.zelakto.tv/VuN7GEp.png)
+[![](https://i.zelakto.tv/images/YaDd.png)](https://i.zelakto.tv/images/Yu7W.png "PhantomBot Console")
+[![](https://i.zelakto.tv/images/YfFl.png)](https://i.zelakto.tv/images/YXyc.png "PhantomBot Control Panel")
+[![](https://i.zelakto.tv/images/Y5W4.png)](https://i.zelakto.tv/images/Y2qR.png "PhantomBot YouTube Player")
+[![](https://i.zelakto.tv/images/Y4mh.png)](https://i.zelakto.tv/images/YDNm.png "PhantomBot Public Playlist Queue")  
+Click on the images to enlarge them.
 
 ## How can I follow along/contribute?
 
 * Our feature roadmap is hosted on [Trello](https://trello.com/b/prjUApDO). Feel free to check out our [Version History](https://phantombot.tv/changelog) as well.
-* If you are a developer, feel free to check out the source and submit pull requests.
+* If you are a developer, feel free to check out the source and submit pull requests. We provide a [guide](https://github.com/PhantomBot/PhantomBot/blob/master/DEVSETUP.md) to setup your development environment.
 * Please don't forget to **watch**, and **star our repo**! Join our growing [community](https://community.phantombot.tv) to keep up to date with the latest PhantomBot development.
 * A huge thanks goes out to the people who have [already contributed to the project](https://github.com/PhantomBot/PhantomBot/graphs/contributors).
 
@@ -45,7 +46,7 @@ Please refer to platform-specific installation documentation.
 
 ## Upgrading PhantomBot
 
-Detailed upgrade instructions are listed on our [documentation](https://docs.phantombot.tv/kb/update).
+Detailed upgrade instructions are listed on our [documentation](https://community.phantombot.tv/t/how-to-update-phantombot/).
 
 ## License
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -145,10 +145,10 @@
                             "        </div>" +
                             "    <td style=\"width: 8em\">" + groupName + "</td>" +
                             "    <td><form onkeypress=\"return event.keyCode != 13\">" +
-                            "        <input type=\"number\" min=\"-1\" id=\"inlineGroupPointsEdit_" + groupName + "\"" +
+                            "        <input type=\"number\" min=\"-1\" class=\"input-control\" id=\"inlineGroupPointsEdit_" + groupName + "\"" +
                             "               value=\"" + groupPoints + "\" style=\"width: 5em\"/>" +
                             "        <button type=\"button\" class=\"btn btn-default btn-xs\"" +
-                            "               onclick=\"$.updateGroupPoints('" + groupName + "', true, false)\"><i class=\"fa fa-pencil\" />" +
+                            "               onclick=\"$.updateGroupPoints('" + groupName + "', true, false)\"><i class=\"fa fa-hdd-o\" />" +
                             "        </button>" +
                             "    </form></td>";
 
@@ -185,10 +185,10 @@
                             "        </div>" +
                             "    <td style=\"width: 8em\">" + groupName + "</td>" +
                             "    <td><form onkeypress=\"return event.keyCode != 13\">" +
-                            "        <input type=\"number\" min=\"-1\" id=\"inlineGroupPointsOfflineEdit_" + groupName + "\"" +
+                            "        <input type=\"number\" min=\"-1\" class=\"input-control\" id=\"inlineGroupPointsOfflineEdit_" + groupName + "\"" +
                             "               value=\"" + groupPoints + "\" style=\"width: 5em\"/>" +
                             "        <button type=\"button\" class=\"btn btn-default btn-xs\"" +
-                            "               onclick=\"$.updateGroupPoints('" + groupName + "', false, false)\"><i class=\"fa fa-pencil\" />" +
+                            "               onclick=\"$.updateGroupPoints('" + groupName + "', false, false)\"><i class=\"fa fa-hdd-o\" />" +
                             "        </button>" +
                             "    </form></td>";
 
@@ -313,7 +313,7 @@
             return;
         }
 
-        if (value.indexOf('.') !== -1 || parseInt(value) < 1) {
+        if (value.indexOf('.') !== -1 || (parseInt(value) < 1 && parseInt(value) !== 0)) {
             $("#setPointGainInput_" + action).val('Only natural numbers are allowed.');
             setTimeout(function() { $("#setPointGainInput_" + action).val(''); }, TIMEOUT_WAIT_TIME * 3);
             return;
@@ -363,6 +363,8 @@
     function modifyUserPoints(action) {
         var username = $("#adjustUserPointsNameInput").val(),
             points = $("#adjustUserPointsInput").val();
+        
+        username = username.replace(/\s+/g, '');
 
         if (action == "take") {
             if (username.length > 0 && points.length > 0) {
@@ -454,7 +456,6 @@
         } else {
             sendDBUpdate("points_modprice", "settings", "pricecomMods", "true");
         }
-        sendCommand('reloadinit');
         setTimeout(function() { doLiteQuery(); }, TIMEOUT_WAIT_TIME);
     }
 

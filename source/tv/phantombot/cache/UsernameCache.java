@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -118,18 +118,14 @@ public class UsernameCache {
     }
 
     public void addUser(String userName, String displayName, int userID) {
-        if (displayName.length() > 0) {
-            if (!hasUser(userName)) {
-                cache.put(userName, new UserData(displayName.replaceAll("\\\\s", " "), userID));
-            }
+        if (!hasUser(userName) && displayName.length() > 0) {
+            cache.put(userName, new UserData(displayName.replaceAll("\\\\s", " "), userID));
         }
     }
 
     public void addUser(String userName, String displayName, String userID) {
-        if (displayName.length() > 0 && userID.length() > 0) {
-            if (!hasUser(userName)) {
-                cache.put(userName, new UserData(displayName.replaceAll("\\\\s", " "), userID));
-            }
+        if (!hasUser(userName) && displayName.length() > 0 && userID.length() > 0) {
+            cache.put(userName, new UserData(displayName.replaceAll("\\\\s", " "), userID));
         }
     }
 
@@ -167,7 +163,7 @@ public class UsernameCache {
 
     /*
      * Internal object for tracking user data.
-     * Note that while Twitch represents the userID as a String, it is an integer value.  We 
+     * Note that while Twitch represents the userID as a String, it is an integer value.  We
      * define this as an int here to conserve memory usage.  The maximum value of an unsigned
      * int within Java is 4,294,967,295 which should serve as a large enough data type.
      */

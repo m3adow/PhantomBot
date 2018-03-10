@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,22 +16,24 @@
  */
 package tv.phantombot.event.ytplayer;
 
-import tv.phantombot.twitchwsirc.Channel;
-
 public class YTPlayerDeletePlaylistByIDEvent extends YTPlayerEvent {
-
     private final String youTubeID;
 
+    /*
+     * Class constructor.
+     *
+     * @param {String} youTubeID
+     */
     public YTPlayerDeletePlaylistByIDEvent(String youTubeID) {
         this.youTubeID = youTubeID;
     }
 
-    public YTPlayerDeletePlaylistByIDEvent(String youTubeID, Channel channel) {
-        super(channel);
-        this.youTubeID = youTubeID;
-    }
-
+    /*
+     * Method that returns the YouTube song ID.
+     *
+     * @return {String} youTubeID
+     */
     public String getYouTubeID() {
-        return youTubeID;
+        return this.youTubeID;
     }
 }

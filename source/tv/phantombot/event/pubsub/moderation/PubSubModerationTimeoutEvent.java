@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,32 +14,58 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package tv.phantombot.event.pubsub;
+package tv.phantombot.event.pubsub.moderation;
 
 public class PubSubModerationTimeoutEvent extends PubSubModerationEvent {
+    private final String reason;
+    private final String time;
 
-	private final String reason;
-	private final String time;
+    /*
+     * Class constructor.
+     *
+     * @param {String} username
+     * @param {String} creator
+     * @param {String} message
+     * @param {String} time
+     */
+    public PubSubModerationTimeoutEvent(String username, String creator, String message, String time) {
+        super(username, creator, message);
 
-	public PubSubModerationTimeoutEvent(String username, String creator, String message, String time) {
-		super(username, creator, message);
+        this.reason = "";
+        this.time = time;
+    }
 
-		this.reason = "";
-		this.time = time;
-	}
+    /*
+     * Class constructor.
+     *
+     * @param {String} username
+     * @param {String} creator
+     * @param {String} message
+     * @param {String} reason
+     * @param {String} time
+     */
+    public PubSubModerationTimeoutEvent(String username, String creator, String message, String reason, String time) {
+        super(username, creator, message);
 
-	public PubSubModerationTimeoutEvent(String username, String creator, String message, String reason, String time) {
-		super(username, creator, message);
+        this.reason = reason;
+        this.time = time;
+    }
 
-		this.reason = reason;
-		this.time = time;
-	}
+    /*
+     * Method that returns the reason as to why the user was banned.
+     *
+     * @return {String} reason
+     */
+    public String getReason() {
+        return this.reason;
+    }
 
-	public String getReason() {
-		return this.reason;
-	}
-
-	public String getTime() {
-		return this.time;
-	}
+    /*
+     * Method that returns the length of the timeout.
+     *
+     * @return {String} time
+     */
+    public String getTime() {
+        return this.time;
+    }
 }

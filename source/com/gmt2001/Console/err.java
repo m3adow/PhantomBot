@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,15 +24,9 @@ import tv.phantombot.PhantomBot;
 
 /**
  *
- * @author Gary Tekulsky
+ * @author gmt2001
  */
-public class err {
-
-    private static final err instance = new err();
-
-    public static err instance() {
-        return instance;
-    }
+public final class err {
 
     private err() {
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ public class HTTPSServer {
     private String     httpsFileName;
     private int        serverPort;
 
-    public HTTPSServer(int myPort, String myPassword, String myWebAuth, final String panelUser, final String panelPassword, final String fileName, final String password) throws Exception {
+    public HTTPSServer(String ip, int myPort, String myPassword, String myWebAuth, final String panelUser, final String panelPassword, final String fileName, final String password) throws Exception {
         serverPort = myPort;
         serverPassword = myPassword.replace("oauth:", "");
         serverWebAuth = myWebAuth;
@@ -82,7 +82,7 @@ public class HTTPSServer {
         this.httpsPassword = password;
 
         try {
-            server = HttpsServer.create(new InetSocketAddress(serverPort), 0);
+            server = HttpsServer.create((!ip.isEmpty() ? new InetSocketAddress(ip, serverPort) : new InetSocketAddress(serverPort)), 0);
             SSLContext sslContext = SSLContext.getInstance("TLS");
 
             KeyStore ks = KeyStore.getInstance("JKS");
@@ -105,22 +105,22 @@ public class HTTPSServer {
                         params.setNeedClientAuth(false);
                         params.setCipherSuites(engine.getEnabledCipherSuites());
                         params.setProtocols(engine.getEnabledProtocols());
-  
+
                         // get the default parameters
                         SSLParameters defaultSSLParameters = c.getDefaultSSLParameters();
                         params.setSSLParameters(defaultSSLParameters);
-  
+
                     } catch (Exception ex) {
                         System.out.println("Failed to create HTTPS port");
                     }
                 }
             });
-  
+
             server.createContext("/", new HTTPSServerHandler());
-  
+
             HttpContext panelContext = server.createContext("/panel", new PanelHandler());
             HttpContext ytContext = server.createContext("/ytplayer", new YTPHandler());
-  
+
             BasicAuthenticator auth = new BasicAuthenticator("PhantomBot Web Utilities") {
                 @Override
                 public boolean checkCredentials(String user, String pwd) {
@@ -129,7 +129,7 @@ public class HTTPSServer {
             };
             ytContext.setAuthenticator(auth);
             panelContext.setAuthenticator(auth);
-  
+
             server.setExecutor(Executors.newCachedThreadPool());
             server.start();
         } catch (KeyManagementException ex) {

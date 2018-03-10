@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,32 +17,60 @@
 package tv.phantombot.event.webpanel;
 
 public class WebPanelSocketUpdateEvent extends WebPanelSocketEvent {
+    private final String id;
+    private final String script;
+    private final String arguments;
+    private final String[] args;
 
-	private final String id;
-	private final String script;
-	private final String arguments;
-	private final String[] args;
+    /*
+     * Class constructor.
+     *
+     * @param {String}   id
+     * @param {String}   script
+     * @param {String}   arguments
+     * @param {String[]} args
+     */
+    public WebPanelSocketUpdateEvent(String id, String script, String arguments, String[] args) {
+        this.id = id;
+        this.script = script;
+        this.arguments = arguments;
+        this.args = args;
+    }
 
-	public WebPanelSocketUpdateEvent(String id, String script, String arguments, String[] args) {
-		this.id = id;
-		this.script = script;
-		this.arguments = arguments;
-		this.args = args;
-	}
+    /*
+     * Method that returns the socket event ID.
+     *
+     * @return {String} id
+     */
+    public String getId() {
+        return this.id;
+    }
 
-	public String getId() {
-		return this.id;
-	}
+    /*
+     * Method that returns the script location and name.
+     *
+     * @return {String} script
+     */
+    public String getScript() {
+        return this.script;
+    }
 
-	public String getScript() {
-		return this.script;
-	}
+    /*
+     * Method that returns the arguments string.
+     *
+     * @return {String} arguments
+     */
+    public String getArguments() {
+        return this.arguments;
+    }
 
-	public String getArguments() {
-		return this.arguments;
-	}
+    /*
+     * Method that returns the arguments array.
+     *
+     * @return {String[]} args
+     */
 
-	public String[] getArgs() {
-		return this.args;
-	}
+    public String[] getArgs() {
+        return this.args;
+    }
 }

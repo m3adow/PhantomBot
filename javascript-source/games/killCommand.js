@@ -44,8 +44,8 @@
             lang = $.replace(lang, '(jail)', '');
             $.say(lang);
             if (!$.isMod(sender) && jailTimeout > 0) {
-                setTimeout(function () {
-                    $.say('.timeout ' + sender + ' ' + jailTimeout);
+                setTimeout(function() {
+                    $.session.say('.timeout ' + sender + ' ' + jailTimeout);
                 }, 1500);
             }
         } else {
@@ -93,9 +93,9 @@
      */
     $.bind('initReady', function() {
         if (selfMessageCount == 0 && otherMessageCount == 0) {
-           loadResponses();
+            loadResponses();
         }
-        
+
         $.registerChatCommand('./games/killCommand.js', 'kill', 7);
         $.registerChatCommand('./games/killCommand.js', 'jailtimeouttime', 1);
     });

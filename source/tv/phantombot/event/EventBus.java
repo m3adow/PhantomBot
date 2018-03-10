@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,60 +16,75 @@
  */
 package tv.phantombot.event;
 
-import com.google.common.collect.Sets;
-import java.util.Set;
-import java.util.concurrent.Executors;
+import net.engio.mbassy.bus.config.BusConfiguration;
+import net.engio.mbassy.bus.config.Feature;
+import net.engio.mbassy.bus.SyncMessageBus;
+
+import net.engio.mbassy.bus.MBassador;
+
 import tv.phantombot.PhantomBot;
 
 public class EventBus {
-
     private static final EventBus instance = new EventBus();
+    private static final MBassador<Event> bus = new MBassador<Event>(new BusConfiguration().addFeature(Feature.SyncPubSub.Default()).addFeature(Feature.AsynchronousHandlerInvocation.Default()).addFeature(Feature.AsynchronousMessageDispatch.Default().setNumberOfMessageDispatchers(10)).addPublicationErrorHandler(new ExceptionHandler()));
 
+    /*
+     * Class constructor.
+     */
+    private EventBus() {
+
+    }
+
+    /*
+     * Method that returns this instance
+     *
+     * @return {EventBus}
+     */
     public static EventBus instance() {
         return instance;
     }
 
-    private final com.google.common.eventbus.AsyncEventBus aeventBus = new com.google.common.eventbus.AsyncEventBus(Executors.newFixedThreadPool(16), new ExceptionHandler());
-    private final com.google.common.eventbus.EventBus eventBus = new com.google.common.eventbus.EventBus(new ExceptionHandler());
-    private final com.google.common.eventbus.EventBus peventBus = new com.google.common.eventbus.EventBus(new ExceptionHandler());
-
-    private final Set<Listener> listeners = Sets.newHashSet();
-
+    /*
+     * Method that registers a listener with the bus.
+     *
+     * @param {Listener} listener
+     */
     public void register(Listener listener) {
-        listeners.add(listener);
-        eventBus.register(listener);
-        aeventBus.register(listener);
-        peventBus.register(listener);
+        bus.subscribe(listener);
     }
 
+    /*
+     * Method that removes a listener from the bus.
+     *
+     * @param {Listener} listener
+     */
     public void unregister(Listener listener) {
-        listeners.remove(listener);
-        eventBus.unregister(listener);
-        aeventBus.unregister(listener);
-        peventBus.unregister(listener);
+        bus.unsubscribe(listener);
     }
 
+    /*
+     * Method that posts an event in sync.
+     *
+     * @param {Event} event
+     */
     public void post(Event event) {
-        if (PhantomBot.instance() == null || PhantomBot.instance().isExiting()) {
+        if (PhantomBot.isInExitState) {
             return;
         }
 
-        eventBus.post(event);
+        bus.publish(event);
     }
 
+    /*
+     * Method that posts an event in async.
+     *
+     * @param {Event} event
+     */
     public void postAsync(Event event) {
-        if (PhantomBot.instance() == null || PhantomBot.instance().isExiting()) {
+        if (PhantomBot.isInExitState) {
             return;
         }
 
-        aeventBus.post(event);
-    }
-
-    public void postPVMSG(Event event) {
-        if (PhantomBot.instance() == null || PhantomBot.instance().isExiting()) {
-            return;
-        }
-
-        peventBus.post(event);
+        bus.publishAsync(event);
     }
 }

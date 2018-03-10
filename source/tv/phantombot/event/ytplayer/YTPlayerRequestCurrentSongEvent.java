@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,14 +16,12 @@
  */
 package tv.phantombot.event.ytplayer;
 
-import tv.phantombot.twitchwsirc.Channel;
-
 public class YTPlayerRequestCurrentSongEvent extends YTPlayerEvent {
 
+    /*
+     * Class constructor.
+     */
     public YTPlayerRequestCurrentSongEvent() {
-    }
 
-    public YTPlayerRequestCurrentSongEvent(Channel channel) {
-        super(channel);
     }
 }

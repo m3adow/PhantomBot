@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,12 +40,12 @@ import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 
 public class YTWebSocketSecureServer extends YTWebSocketServer {
 
-    public YTWebSocketSecureServer(int port, String authString, String authStringRO, String keyFileName, String keyPassword) throws Exception {
-        this(port, authString, authStringRO, keyFileName, keyPassword, 200);
+    public YTWebSocketSecureServer(String ip, int port, String authString, String authStringRO, String keyFileName, String keyPassword) throws Exception {
+        this(ip, port, authString, authStringRO, keyFileName, keyPassword, 200);
     }
 
-    public YTWebSocketSecureServer(int port, String authString, String authStringRO, String keyFileName, String keyPassword, int tasksAllowed) throws Exception {
-        super(port, authString, authStringRO);
+    public YTWebSocketSecureServer(String ip, int port, String authString, String authStringRO, String keyFileName, String keyPassword, int tasksAllowed) throws Exception {
+        super(ip, port, authString, authStringRO);
 
         Thread.setDefaultUncaughtExceptionHandler(com.gmt2001.UncaughtExceptionHandler.instance());
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,17 @@
 package tv.phantombot.event.irc.channel;
 
 import tv.phantombot.event.irc.IrcEvent;
-import tv.phantombot.twitchwsirc.Channel;
-import tv.phantombot.twitchwsirc.Session;
 
-public class IrcChannelEvent extends IrcEvent {
+import tv.phantombot.twitchwsirc.chat.Session;
 
-    private final Channel channel;
+public abstract class IrcChannelEvent extends IrcEvent {
 
-    protected IrcChannelEvent(Session session, Channel channel) {
+    /*
+     * Class constructor
+     *
+     * @param {Session} session
+     */
+    protected IrcChannelEvent(Session session) {
         super(session);
-        this.channel = channel;
-    }
-
-    public Channel getChannel() {
-        return channel;
     }
 }

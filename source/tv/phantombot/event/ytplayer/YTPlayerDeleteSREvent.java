@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,22 +16,24 @@
  */
 package tv.phantombot.event.ytplayer;
 
-import tv.phantombot.twitchwsirc.Channel;
-
 public class YTPlayerDeleteSREvent extends YTPlayerEvent {
-
     private final String id;
 
+    /*
+     * Class constructor.
+     *
+     * @param {String} id
+     */
     public YTPlayerDeleteSREvent(String id) {
         this.id = id;
     }
 
-    public YTPlayerDeleteSREvent(String id, Channel channel) {
-        super(channel);
-        this.id = id;
-    }
-
+    /*
+     * Method that returns the event ID.
+     *
+     * @return {String} id
+     */
     public String getId() {
-        return id;
+        return this.id;
     }
 }

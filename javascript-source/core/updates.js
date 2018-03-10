@@ -18,67 +18,72 @@
 
     /** New setup */
     if ($.changed == true && $.changed != null && $.changed != undefined && !$.inidb.exists('updates', 'installedNewBot') && $.inidb.get('updates', 'installedNewBot') != 'true') {
-        $.consoleLn('Initializing PhantomBot Version ' + $.version + ' For The First Time...');
+        $.consoleLn('');
+        $.consoleLn('Initializing PhantomBot version ' + $.version + ' for the first time...');
 
         modules = [
-        './commands/topCommand.js',
-        './commands/highlightCommand.js',
-        './commands/deathctrCommand.js',
-        './commands/dualstreamCommand.js',
-        './games/8ball.js',
-        './games/adventureSystem.js',
-        './games/killCommand.js',
-        './games/random.js',
-        './games/roll.js',
-        './games/roulette.js',
-        './games/slotMachine.js',
-        './games/gambling.js',
-        './handlers/followHandler.js',
-        './handlers/hostHandler.js',
-        './handlers/subscribeHandler.js',
-        './handlers/donationHandler.js',
-        './handlers/wordCounter.js',
-        './handlers/gameWispHandler.js',
-        './handlers/keywordHandler.js',
-        './handlers/twitterHandler.js',
-        './handlers/streamTipHandler.js',
-        './handlers/tipeeeStreamHandler.js',
-        './systems/cleanupSystem.js',
-        './systems/greetingSystem.js',
-        './systems/pointSystem.js',
-        './systems/noticeSystem.js',
-        './systems/pollSystem.js',
-        './systems/quoteSystem.js',
-        './systems/raffleSystem.js',
-        './systems/ticketraffleSystem.js',
-        './systems/raidSystem.js',
-        './systems/youtubePlayer.js',
-        './systems/ranksSystem.js',
-        './systems/auctionSystem.js',
-        './systems/audioPanelSystem.js',
-        './systems/queueSystem.js',
-        './systems/bettingSystem.js',
-        './discord/handlers/bitsHandler.js',
-        './discord/handlers/followHandler.js',
-        './discord/handlers/subscribeHandler.js',
-        './discord/handlers/tipeeeStreamHandler.js',
-        './discord/handlers/streamtipHandler.js',
-        './discord/handlers/streamlabsHandler.js',
-        './discord/handlers/hostHandler.js',
-        './discord/handlers/twitterHandler.js',
-        './discord/handlers/keywordHandler.js',
-        './discord/handlers/streamHandler.js',
-        './discord/handlers/gamewispHandler.js',
-        './discord/systems/greetingsSystem.js',
-        './discord/commands/customCommands.js',
-        './discord/games/8ball.js',
-        './discord/games/kill.js',
-        './discord/games/random.js',
-        './discord/games/roulette.js',
-        './discord/games/gambling.js',
-        './discord/games/roll.js',
-        './discord/games/slotMachine.js',
-        './discord/systems/pointSystem.js'
+            './commands/topCommand.js',
+            './commands/highlightCommand.js',
+            './commands/deathctrCommand.js',
+            './commands/dualstreamCommand.js',
+            './games/8ball.js',
+            './games/adventureSystem.js',
+            './games/killCommand.js',
+            './games/random.js',
+            './games/roll.js',
+            './games/roulette.js',
+            './games/slotMachine.js',
+            './games/gambling.js',
+            './handlers/followHandler.js',
+            './handlers/hostHandler.js',
+            './handlers/subscribeHandler.js',
+            './handlers/donationHandler.js',
+            './handlers/wordCounter.js',
+            './handlers/gameWispHandler.js',
+            './handlers/keywordHandler.js',
+            './handlers/twitterHandler.js',
+            './handlers/streamTipHandler.js',
+            './handlers/tipeeeStreamHandler.js',
+            './systems/cleanupSystem.js',
+            './systems/greetingSystem.js',
+            './systems/pointSystem.js',
+            './systems/noticeSystem.js',
+            './systems/pollSystem.js',
+            './systems/quoteSystem.js',
+            './systems/raffleSystem.js',
+            './systems/ticketraffleSystem.js',
+            './systems/raidSystem.js',
+            './systems/youtubePlayer.js',
+            './systems/ranksSystem.js',
+            './systems/auctionSystem.js',
+            './systems/audioPanelSystem.js',
+            './systems/queueSystem.js',
+            './systems/bettingSystem.js',
+            './commands/nameConverter.js',
+            './handlers/clipHandler.js',
+            './handlers/dataServiceHandler.js',
+            './handlers/gameScanHandler.js',
+            './discord/handlers/bitsHandler.js',
+            './discord/handlers/followHandler.js',
+            './discord/handlers/subscribeHandler.js',
+            './discord/handlers/tipeeeStreamHandler.js',
+            './discord/handlers/streamtipHandler.js',
+            './discord/handlers/streamlabsHandler.js',
+            './discord/handlers/hostHandler.js',
+            './discord/handlers/twitterHandler.js',
+            './discord/handlers/keywordHandler.js',
+            './discord/handlers/streamHandler.js',
+            './discord/handlers/gamewispHandler.js',
+            './discord/systems/greetingsSystem.js',
+            './discord/commands/customCommands.js',
+            './discord/games/8ball.js',
+            './discord/games/kill.js',
+            './discord/games/random.js',
+            './discord/games/roulette.js',
+            './discord/games/gambling.js',
+            './discord/games/roll.js',
+            './discord/games/slotMachine.js',
+            './discord/systems/pointSystem.js'
         ];
 
         $.consoleLn('Disabling default modules...');
@@ -86,7 +91,7 @@
             $.inidb.set('modules', modules[i], 'false');
         }
 
-        $.consoleLn('Adding new default custom commands...');
+        $.consoleLn('Adding default custom commands...');
         $.inidb.set('command', 'uptime', '(pointtouser) (channelname) has been online for (uptime)');
         $.inidb.set('command', 'followage', '(followage)');
         $.inidb.set('command', 'playtime', '(pointtouser) (channelname) has been playing (game) for (playtime)');
@@ -95,20 +100,23 @@
         $.inidb.set('command', 'age', '(age)');
 
         $.consoleLn('Installing old updates...');
-        versions = ['installedv2', 'installedv2.0.5', 'installedv2.0.6', 'installedv2.0.7', 'installedv2.0.7.2', 
-        'installedv2.0.8', 'installedv2.0.9', 'installedv2.1.0', 'installedv2.1.1', 'installedv2.2.1', 'installedv2.3s', 
-        'installedv2.3.3ss', 'installedv2.3.5ss', 'installedv2.3.5.1', 'installedv2.3.5.2', 'installedv2.3.5.3', 'installed2.3.6', 
-        'installed2.3.6ss', 'installed2.3.6b', 'installedv2.3.7', 'installedv2.3.7b', 'installedv2.3.9'];
+        versions = ['installedv2', 'installedv2.0.5', 'installedv2.0.6', 'installedv2.0.7', 'installedv2.0.7.2',
+            'installedv2.0.8', 'installedv2.0.9', 'installedv2.1.0', 'installedv2.1.1', 'installedv2.2.1', 'installedv2.3s',
+            'installedv2.3.3ss', 'installedv2.3.5ss', 'installedv2.3.5.1', 'installedv2.3.5.2', 'installedv2.3.5.3', 'installedv2.3.6',
+            'installedv2.3.6ss', 'installedv2.3.6b', 'installedv2.3.7', 'installedv2.3.7b', 'installedv2.3.9', 'installedv2.3.9.1', 'installedv2.3.9.1b',
+            'installedv2.4.0'
+        ];
         for (i in versions) {
             $.inidb.set('updates', versions[i], 'true');
         }
 
-        $.consoleLn('Initializing complete!');
         sounds = "";
         modules = "";
         versions = "";
         $.changed = false;
         $.inidb.set('updates', 'installedNewBot', 'true');
+        $.consoleLn('Initializing complete!');
+        $.consoleLn('');
     }
 
     /** Version 2.0 updates */
@@ -250,8 +258,8 @@
         }
 
         /**
-        * delete uptime command if it exits because I added this as a default command.
-        */
+         * delete uptime command if it exits because I added this as a default command.
+         */
         if ($.inidb.exists('command', 'uptime')) {
             $.inidb.del('command', 'uptime');
         }
@@ -325,7 +333,7 @@
 
         $.consoleLn('PhantomBot v2.1 updates completed!');
         $.inidb.set('updates', 'installedv2.1.0', 'true');
-        $.inidb.set('updates', 'installedNewBot', 'true');//If bot login is deleted after updates were installed we don't want to reset the modules.
+        $.inidb.set('updates', 'installedNewBot', 'true'); //If bot login is deleted after updates were installed we don't want to reset the modules.
     }
 
     /** Version 2.2 updates */
@@ -572,7 +580,7 @@
         $.inidb.set('modules', './discord/systems/pointSystem.js', 'false');
 
         $.inidb.set('permcom', $.botName.toLowerCase(), '2');
-        
+
         $.consoleLn('PhantomBot update 2.3.6 completed!');
         $.inidb.set('updates', 'installedv2.3.6', 'true');
     }
@@ -595,13 +603,21 @@
         $.consoleLn('Updating cooldowns...');
         for (i in keys) {
             seconds = $.inidb.get('cooldown', keys[i]);
-            $.inidb.set('cooldown', keys[i], JSON.stringify({command: String(keys[i]), seconds: String(seconds), isGlobal: 'true'}));
+            $.inidb.set('cooldown', keys[i], JSON.stringify({
+                command: String(keys[i]),
+                seconds: String(seconds),
+                isGlobal: 'true'
+            }));
         }
 
         $.consoleLn('Updating Discord cooldowns...');
         for (i in keys) {
             seconds = $.inidb.get('discordCooldown', keys[i]);
-            $.inidb.set('discordCooldown', keys[i], JSON.stringify({command: String(keys[i]), seconds: String(seconds), isGlobal: 'true'}));
+            $.inidb.set('discordCooldown', keys[i], JSON.stringify({
+                command: String(keys[i]),
+                seconds: String(seconds),
+                isGlobal: 'true'
+            }));
         }
 
         $.consoleLn('PhantomBot update 2.3.6s completed!');
@@ -694,9 +710,90 @@
         $.consoleLn('Removing old discord handler...');
         $.inidb.del('modules', './handlers/discordHandler.js');
 
+        $.consoleLn('Removing old emotes cache...');
+        $.inidb.RemoveFile('emotecache');
+
+        $.inidb.set('modules', './discord/handlers/streamElementsHandler.js', 'false');
+        $.inidb.set('modules', './handlers/streamElementsHandler.js', 'false');
+
         $.consoleLn('PhantomBot update 2.3.9 completed!');
         $.inidb.set('updates', 'installedv2.3.9', 'true');
     }
+
+    /* version 2.3.9.1 updates */
+    if (!$.inidb.exists('updates', 'installedv2.3.9.1') || $.inidb.get('updates', 'installedv2.3.9.1') != 'true') {
+        $.consoleLn('Starting PhantomBot update 2.3.9.1 updates...');
+
+        $.consoleLn('Updating old variables...');
+
+        if ($.inidb.FileExists('discordSettings')) {
+            $.inidb.set('discordSettings', 'gameMessage', '(name) just changed game on Twitch!');
+            $.inidb.set('discordSettings', 'onlineMessage', '(name) just went online on Twitch!');
+        }
+
+        $.consoleLn('PhantomBot update 2.3.9.1 completed!');
+        $.inidb.set('updates', 'installedv2.3.9.1', 'true');
+    }
+
+    /* version 2.3.9.1b updates */
+    if (!$.inidb.exists('updates', 'installedv2.3.9.1b') || $.inidb.get('updates', 'installedv2.3.9.1b') != 'true') {
+        $.consoleLn('Starting PhantomBot update 2.3.9.1b updates...');
+
+        if ($.inidb.FileExists('discordStreamStats')) {
+            $.consoleLn('Removing old Discord stats...');
+            $.inidb.RemoveFile('discordStreamStats');
+        }
+
+        $.consoleLn('PhantomBot update 2.3.9.1b completed!');
+        $.inidb.set('updates', 'installedv2.3.9.1b', 'true');
+    }
+
+    /* version 2.4.0 updates */
+    if (!$.inidb.exists('updates', 'installedv2.4.0') || $.inidb.get('updates', 'installedv2.4.0') != 'true') {
+        $.consoleLn('Starting PhantomBot update 2.4.0 updates...');
+
+        if ($.getIniDbNumber('cooldownSettings', 'defaultCooldownTime', 5) < 5) {
+            $.inidb.set('cooldownSettings', 'defaultCooldownTime', 5);
+        }
+
+        $.consoleLn('Updating keywords...');
+        var keys = $.inidb.GetKeyList('keywords', ''),
+            keywords = [],
+            i;
+
+        for (i in keys) {
+            keywords.push({
+                key: keys[i],
+                res: $.inidb.get('keywords', keys[i])
+            });
+        }
+
+        $.inidb.RemoveFile('keywords');
+
+        for (i in keywords) {
+            try {
+                new RegExp('\\b' + keywords[i].key + '\\b');
+
+                $.inidb.set('keywords', 'regex:\\b' + keywords[i].key + '\\b', JSON.stringify({
+                    keyword: 'regex:\\b' + keywords[i].key + '\\b',
+                    response: keywords[i].res + '',
+                    isRegex: true
+                }));
+                $.inidb.set('coolkey', 'regex:\\b' + keywords[i].key + '\\b', $.getIniDbNumber('coolkey', keywords[i].key, 5));
+                $.inidb.del('coolkey', keywords[i].key);
+            } catch (e) {
+                $.inidb.set('keywords', keywords[i].key, JSON.stringify({
+                    keyword: keywords[i].key,
+                    response: keywords[i].res + '',
+                    isRegex: false
+                }));
+            }
+        }
+
+        $.consoleLn('PhantomBot update 2.4.0 completed!');
+        $.inidb.set('updates', 'installedv2.4.0', 'true');
+    }
+
 
     /**
      * @function getTableContents

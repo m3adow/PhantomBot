@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,30 +16,36 @@
  */
 package tv.phantombot.event.gamewisp;
 
-import tv.phantombot.twitchwsirc.Channel;
-
 public class GameWispBenefitsEvent extends GameWispEvent {
-
     private final String username;
     private final int tier;
 
+    /*
+     * Class constructor
+     *
+     * @param {String} username
+     * @param {int}    tier
+     */
     public GameWispBenefitsEvent(String username, int tier) {
         this.username = username;
         this.tier = tier;
     }
 
-    public GameWispBenefitsEvent(String username, int tier, Channel channel) {
-        super(channel);
-        this.username = username;
-        this.tier = tier;
-    }
-
+    /*
+     * Method that returns the subscriber's name.
+     *
+     * @return {String} username
+     */
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
+    /*
+     * Method that returns the user's tier.
+     *
+     * @return {int} tier
+     */
     public int getTier() {
-        return tier;
+        return this.tier;
     }
 }
-

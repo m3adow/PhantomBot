@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 /* Provide a simple scramble mechanism for strings.  Do not rely on this
  * for security as, obviously, the source code is right here making reverse
- * engineering very easy to do.  The idea is to simply make something a 
+ * engineering very easy to do.  The idea is to simply make something a
  * little harder to read instantly, nothing more than that.
  */
 
@@ -27,8 +27,7 @@ import java.util.Base64;
 import java.io.UnsupportedEncodingException;
 import java.lang.IllegalArgumentException;
 
-public class SimpleScramble
-{
+public class SimpleScramble {
     private String simpleSalt = "%M+JPH~b#q9$yV+'atwq'|2s*A6?=h";
 
     public String simpleFixedScramble(String unscrambled) {

@@ -75,9 +75,9 @@
     });
 
     /**
-     * @event discordCommand
+     * @event discordChannelCommand
      */
-    $.bind('discordCommand', function(event) {
+    $.bind('discordChannelCommand', function(event) {
         var sender = event.getSender(),
             channel = event.getChannel(),
             command = event.getCommand(),
@@ -136,13 +136,9 @@
      * @event initReady
      */
     $.bind('initReady', function() {
-        if ($.bot.isModuleEnabled('./discord/handlers/streamtipHandler.js')) {
-            $.discord.registerCommand('./discord/handlers/streamtipHandler.js', 'streamtiphandler', 1);
-            $.discord.registerSubCommand('streamtiphandler', 'toggle', 1);
-            $.discord.registerSubCommand('streamtiphandler', 'message', 1);
-            $.discord.registerSubCommand('streamtiphandler', 'channel', 1);
-
-            // $.unbind('initReady'); Needed or not?
-        }
+        $.discord.registerCommand('./discord/handlers/streamtipHandler.js', 'streamtiphandler', 1);
+        $.discord.registerSubCommand('streamtiphandler', 'toggle', 1);
+        $.discord.registerSubCommand('streamtiphandler', 'message', 1);
+        $.discord.registerSubCommand('streamtiphandler', 'channel', 1);
     });
 })();

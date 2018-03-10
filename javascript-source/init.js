@@ -62,7 +62,7 @@
      * @param {String} message
      */
     function consoleDebug(message) {
-        if (Packages.me.mast3rplan.phantombot.PhantomBot.enableDebugging) {
+        if (Packages.tv.phantombot.PhantomBot.enableDebugging) {
             try {
                 throw new Error();
             } catch (ex) {
@@ -88,7 +88,7 @@
                     for (var i = 0; i < arguments.length; i++) {
                         args.push(arguments[i]);
                     }
-    
+
                     obj[name].save(obj, args);
                 };
             };
@@ -208,7 +208,7 @@
         return modules[scriptName];
     }
 
-     /*
+    /*
      * @function getHook
      *
      * @param  {String} scriptName
@@ -229,7 +229,7 @@
     function getHookIndex(scriptName, hookName) {
         var hook = hooks[hookName],
             i;
-            
+
         if (hook !== undefined) {
             for (i in hook.handlers) {
                 if (hook.handlers[i].scriptName.equalsIgnoreCase(scriptName)) {
@@ -250,7 +250,9 @@
         var scriptName = $script.getPath().replace('\\', '/').replace('./scripts/', ''),
             i = getHookIndex(scriptName, hookName);
 
-        if (i !== -1) {
+        if (hookName !== 'initReady' && $api.exists(hookName) == false) {
+            Packages.com.gmt2001.Console.err.printlnRhino('[addHook()@init.js:254] Failed to register hook "' + hookName + '" since there is no such event.');
+        } else if (i !== -1) {
             hooks[hookName].handlers[i].handler = handler;
         } else {
             if (hooks[hookName] === undefined) {
@@ -316,6 +318,8 @@
     function init() {
         // Generate JavaScript trampolines for Java functions.
         generateJavaTrampolines();
+        // Register events.
+        events();
 
         // Load all core modules.
         loadScript('./core/misc.js');
@@ -350,6 +354,7 @@
             loadScript('./discord/core/registerCommand.js');
             loadScript('./discord/core/accountLink.js');
             loadScript('./discord/core/commandCooldown.js');
+            loadScript('./discord/core/roleManager.js');
 
             // Load the other discord modules
             loadScriptRecursive('./discord');
@@ -361,7 +366,25 @@
         $.addComRegisterCommands();
         $.addComRegisterAliases();
 
+        consoleLn('');
 
+        if ($.isNightly) {
+            consoleLn('PhantomBot Nightly Build - No Support is Provided');
+            consoleLn('Please report bugs including the date of the Nightly Build and Repo Version to:');
+            consoleLn('https://community.phantombot.tv/c/support/bug-reports');
+        } else if ($.isPrerelease) {
+            consoleLn('PhantomBot Pre-Release Build - Please Report Bugs and Issues Found');
+            consoleLn('When reporting bugs or issues, please remember to indicate that this is a pre-release build.');
+        } else {
+            consoleLn('For support please visit: https://community.phantombot.tv');
+        }
+        consoleLn('');
+    }
+
+    /*
+     * @function events - registers all events with the core.
+     */
+    function events() {
         // Load all API events.
 
         /*
@@ -391,11 +414,10 @@
             if (event.getUser().equalsIgnoreCase($.botName) && event.getMode().equalsIgnoreCase('O')) {
                 if (event.getAdd().toString().equals('true')) {
                     if (isReady === false) {
-                        if ($.inidb.exists('settings', 'connectedMsg')) {
-                            $.say($.inidb.get('settings', 'connectedMsg'));
-                        } else {
-                            consoleLn($.botName + ' ready!'); 
-                        }
+                        // Bot is now ready.
+                        consoleLn($.botName + ' ready!');
+                        // Call the initReady event.
+                        callHook('initReady', null, false);
                     }
                     isReady = true;
                 }
@@ -415,7 +437,7 @@
             // Check if the command exists or if the module is disabled.
             if (!$.commandExists(command) || !isModuleEnabled($.getCommandScript(command))) {
                 return;
-            } else 
+            } else
 
             // Check if the command has an alias.
             if ($.aliasExists(command)) {
@@ -436,39 +458,49 @@
                     }
                 }
                 return;
-            } else 
+            } else
 
             // Check the command permission.
             if ($.permCom(sender, command, subCommand) !== 0) {
                 $.sayWithTimeout($.whisperPrefix(sender) + $.lang.get('cmd.perm.404', (!$.subCommandExists(command, subCommand) ? $.getCommandGroupName(command) : $.getSubCommandGroupName(command, subCommand))), $.getIniDbBoolean('settings', 'permComMsgEnabled', false));
+                consoleDebug('Command !' + command + ' was not sent due to the user not having permission for it.');
                 return;
-            } else 
+            } else
 
             // Check the command cooldown.
             if ($.coolDown.get(command, sender, isMod) !== 0) {
                 $.sayWithTimeout($.whisperPrefix(sender) + $.lang.get('init.cooldown.msg', command, $.coolDown.getSecs(sender, command)), $.getIniDbBoolean('settings', 'coolDownMsgEnabled', false));
+                consoleDebug('Command !' + command + ' was not sent due to it being on cooldown.');
                 return;
-            } else 
+            } else
 
             // Check the command cost.
-            if ($.priceCom(sender, command, subCommand, isMod) !== 0) {
+            if ($.priceCom(sender, command, subCommand, isMod) === 1) {
                 $.sayWithTimeout($.whisperPrefix(sender) + $.lang.get('cmd.needpoints', $.getPointsString($.getCommandPrice(command, subCommand, ''))), $.getIniDbBoolean('settings', 'priceComMsgEnabled', false));
+                consoleDebug('Command !' + command + ' was not sent due to the user not having enough points.');
                 return;
             }
 
             // Call the command function.
             callHook('command', event, false);
+
+            // Decrease or add points after the command is sent to not slow anything down.
+            if ($.priceCom(sender, command, subCommand, isMod) === 0) {
+                $.inidb.decr('points', sender, $.getCommandPrice(command, subCommand, ''));
+            } else if ($.payCom(command) === 0) {
+                $.inidb.incr('points', sender, $.getCommandPay(command));
+            }
         });
 
         /*
-         * @event discordCommand
+         * @event discordChannelCommand
          */
-        $api.on($script, 'discordCommand', function(event) {
+        $api.on($script, 'discordChannelCommand', function(event) {
             var username = event.getUsername(),
                 command = event.getCommand(),
                 channel = event.getChannel(),
                 isAdmin = event.isAdmin(),
-                sender = event.getSenderId(),
+                senderId = event.getSenderId(),
                 args = event.getArgs();
 
             if ($.discord.commandExists(command) === false && ($.discord.aliasExists(command) === false || $.discord.aliasExists(command) === true && $.discord.commandExists($.discord.getCommandAlias(command)) === false)) {
@@ -479,15 +511,15 @@
                 command = event.setCommand($.discord.getCommandAlias(command));
             }
 
-            if (isAdmin == false && $.discord.permCom(command, (args[0] !== undefined && $.discord.subCommandExists(args[0].toLowerCase()) ? args[0].toLowerCase() : '')) !== 0) {
+            if (isAdmin == false && $.discord.permCom(command, (args[0] !== undefined && $.discord.subCommandExists(command, args[0].toLowerCase()) ? args[0].toLowerCase() : '')) !== 0) {
                 return;
             }
 
-            if (isAdmin == false && $.discord.cooldown.get(command, sender) !== 0) {
+            if (isAdmin == false && $.discord.cooldown.get(command, senderId) !== 0) {
                 return;
             }
 
-            if ($.discord.getCommandCost(command) > 0 && $.discord.getUserPoints(username) > $.discord.getCommandCost(command)) {
+            if ($.discord.getCommandCost(command) > 0 && $.discord.getUserPoints(senderId) < $.discord.getCommandCost(command)) {
                 return;
             }
 
@@ -499,11 +531,11 @@
                 }
             }
 
-            callHook('discordCommand', event, false);
+            callHook('discordChannelCommand', event, false);
 
             // Do this last to not slow down the command hook.
             if ($.discord.getCommandCost(command) > 0) {
-                $.discord.decrUserPoints(sender, $.discord.getCommandCost(command));
+                $.discord.decrUserPoints(senderId, $.discord.getCommandCost(command));
             }
         });
 
@@ -557,10 +589,24 @@
         });
 
         /*
+         * @event twitchClip
+         */
+        $api.on($script, 'twitchClip', function(event) {
+            callHook('twitchClip', event, false);
+        });
+
+        /*
          * @event ircChannelJoin
          */
         $api.on($script, 'ircChannelJoin', function(event) {
             callHook('ircChannelJoin', event, false);
+        });
+
+        /*
+         * @event ircChannelUsersUpdate
+         */
+        $api.on($script, 'ircChannelUsersUpdate', function(event) {
+            callHook('ircChannelUsersUpdate', event, false);
         });
 
         /*
@@ -641,6 +687,20 @@
         });
 
         /*
+         * @event streamElementsDonationInitialized
+         */
+        $api.on($script, 'streamElementsDonationInitialized', function(event) {
+            callHook('streamElementsDonationInitialized', event, false);
+        });
+
+        /*
+         * @event streamElementsDonation
+         */
+        $api.on($script, 'streamElementsDonation', function(event) {
+            callHook('streamElementsDonation', event, false);
+        });
+
+        /*
          * @event getEmotes
          */
         $api.on($script, 'emotesGet', function(event) {
@@ -652,6 +712,13 @@
          */
         $api.on($script, 'yTPlayerConnect', function(event) {
             callHook('yTPlayerConnect', event, false);
+        });
+
+        /*
+         * @event yTPlayerLoadPlaylistEvent
+         */
+        $api.on($script, 'yTPlayerLoadPlaylist', function(event) {
+            callHook('yTPlayerLoadPlaylist', event, false);
         });
 
         /*
@@ -781,6 +848,13 @@
         });
 
         /*
+         * @event twitterRetweetEvent
+         */
+        $api.on($script, 'twitterRetweet', function(event) {
+            callHook('twitterRetweet', event, false);
+        });
+
+        /*
          * @event twitchOnlineEvent
          */
         $api.on($script, 'twitchOnline', function(event) {
@@ -800,54 +874,75 @@
         $api.on($script, 'twitchGameChange', function(event) {
             callHook('twitchGameChange', event, false);
         });
-
+		
         /*
-         * @event newSubscriber
+         * @event twitchTitleChangeEvent
          */
-        $api.on($script, 'newSubscriber', function(event) {
-            callHook('newSubscriber', event, false);
+        $api.on($script, 'twitchTitleChange', function(event) {
+            callHook('twitchTitleChange', event, false);
+        });
+								
+        /*
+         * @event twitchSubscriber
+         */
+        $api.on($script, 'twitchSubscriber', function(event) {
+            callHook('twitchSubscriber', event, false);
         });
 
         /*
-         * @event newPrimeSubscriber
+         * @event twitchPrimeSubscriber
          */
-        $api.on($script, 'newPrimeSubscriber', function(event) {
-            callHook('newPrimeSubscriber', event, false);
+        $api.on($script, 'twitchPrimeSubscriber', function(event) {
+            callHook('twitchPrimeSubscriber', event, false);
         });
 
         /*
-         * @event newReSubscriber
+         * @event reSubscriber
          */
-        $api.on($script, 'newReSubscriber', function(event) {
-            callHook('newReSubscriber', event, false);
+        $api.on($script, 'twitchReSubscriber', function(event) {
+            callHook('twitchReSubscriber', event, false);
         });
 
         /*
-         * @event bits
+         * @event twitchSubscriptionGift
          */
-        $api.on($script, 'bits', function(event) {
-            callHook('bits', event, false);
+        $api.on($script, 'twitchSubscriptionGift', function(event) {
+            callHook('twitchSubscriptionGift', event, false);
         });
 
         /*
-         * @event discordMessage
+         * @event twitchBits
          */
-        $api.on($script, 'discordMessage', function(event) {
-            callHook('discordMessage', event, false);
+        $api.on($script, 'twitchBits', function(event) {
+            callHook('twitchBits', event, false);
         });
 
         /*
-         * @event discordJoin
+         * @event twitchRaid
          */
-        $api.on($script, 'discordJoin', function(event) {
-            callHook('discordJoin', event, false);
+        $api.on($script, 'twitchRaid', function(event) {
+            callHook('twitchRaid', event, false);
         });
 
         /*
-         * @event discordLeave
+         * @event discordChannelMessage
          */
-        $api.on($script, 'discordLeave', function(event) {
-            callHook('discordLeave', event, false);
+        $api.on($script, 'discordChannelMessage', function(event) {
+            callHook('discordChannelMessage', event, false);
+        });
+
+        /*
+         * @event discordChannelJoin
+         */
+        $api.on($script, 'discordChannelJoin', function(event) {
+            callHook('discordChannelJoin', event, false);
+        });
+
+        /*
+         * @event discordChannelPart
+         */
+        $api.on($script, 'discordChannelPart', function(event) {
+            callHook('discordChannelPart', event, false);
         });
 
         /*
@@ -865,48 +960,32 @@
         });
 
         /*
-         * @event Timeout
+         * @event PubSubModerationTimeout
          */
-        $api.on($script, 'Timeout', function(event) {
-            callHook('Timeout', event, false);
+        $api.on($script, 'PubSubModerationTimeout', function(event) {
+            callHook('PubSubModerationTimeout', event, false);
         });
 
         /*
-         * @event UnTimeout
+         * @event PubSubModerationUnTimeout
          */
-        $api.on($script, 'UnTimeout', function(event) {
-            callHook('UnTimeout', event, false);
+        $api.on($script, 'PubSubModerationUnTimeout', function(event) {
+            callHook('PubSubModerationUnTimeout', event, false);
         });
 
         /*
-         * @event Banned
+         * @event PubSubModerationBan
          */
-        $api.on($script, 'Banned', function(event) {
-            callHook('Banned', event, false);
+        $api.on($script, 'PubSubModerationBan', function(event) {
+            callHook('PubSubModerationBan', event, false);
         });
 
         /*
-         * @event UnBanned
+         * @event PubSubModerationUnBan
          */
-        $api.on($script, 'UnBanned', function(event) {
-            callHook('UnBanned', event, false);
+        $api.on($script, 'PubSubModerationUnBan', function(event) {
+            callHook('PubSubModerationUnBan', event, false);
         });
-
-        $.log.event('init.js api\'s loaded.');
-
-        consoleLn('');
-
-        // Call the initReady event.
-        callHook('initReady', null, false);
-
-        if ($.isNightly) {
-            consoleLn('PhantomBot Nightly Build - No Support is Provided');
-            consoleLn('Please report bugs including the date of the Nightly Build and Repo Version to:');
-            consoleLn('https://community.phantombot.tv/c/support/bug-reports');
-        } else {
-            consoleLn('For support please visit: https://community.phantombot.tv');
-        }
-        consoleLn('');
     }
 
     // Export functions to API
@@ -924,7 +1003,7 @@
         getModule: getModule,
         getHook: getHook,
         modules: modules,
-        hooks: hooks   
+        hooks: hooks
     };
 
     // Load init.js

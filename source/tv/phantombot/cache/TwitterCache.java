@@ -1,7 +1,7 @@
 /* astyle --style=java --indent=spaces=4 --mode=java */
 
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import tv.phantombot.PhantomBot;
 import tv.phantombot.event.EventBus;
 import tv.phantombot.event.twitter.TwitterEvent;
 import tv.phantombot.event.twitter.TwitterRetweetEvent;
-import tv.phantombot.twitchwsirc.Channel;
 
 /*
  * TwitterCache Class
@@ -230,14 +229,14 @@ public class TwitterCache implements Runnable {
         /* Poll latest retweet. */
         String tweet = "[RT] " + statuses.get(0).getText() + " [" + GoogleURLShortenerAPIv1.instance().getShortURL(TwitterAPI.instance().getTwitterURLFromId(twitterID)) + "]";
         updateDBString("last_retweets", tweet);
-        EventBus.instance().post(new TwitterEvent(tweet, getChannel()));
+        EventBus.instance().post(new TwitterEvent(tweet));
 
         /* Update DB with the last Tweet ID processed. */
         updateDBLong("lastid_retweets", twitterID);
     }
 
     /*
-     * Handles retweet rewards with the Twitter API.  Due to the getRetweets() API call only 
+     * Handles retweet rewards with the Twitter API.  Due to the getRetweets() API call only
      * allowing 75 calls in 15 minutes, this call will run only once every five minutes and
      * is not configurable in the bot.  Since we pull all retweets every 5 minutes, and that
      * can return a maximum of 20; this means that we will reach 60 calls maximum in 15
@@ -263,18 +262,18 @@ public class TwitterCache implements Runnable {
          * getRetweetsOfMe() call. So, walk that list of Tweets to get at the Retweet information
          * that includes the Screen Name (@screenName) of the person that performed the Retweet.
          */
-        ArrayList<String> userNameList = new ArrayList<>();
+        ArrayList<String> userNameList = new ArrayList<String>();
         for (Status status : statuses) {
             List<Status>retweetStatuses = TwitterAPI.instance().getRetweets(status.getId());
             if (retweetStatuses != null) {
-                    for (Status retweetStatus : retweetStatuses) {
-                        userNameList.add(retweetStatus.getUser().getScreenName());
+                for (Status retweetStatus : retweetStatuses) {
+                    userNameList.add(retweetStatus.getUser().getScreenName());
                 }
             }
         }
 
         if (!userNameList.isEmpty()) {
-            EventBus.instance().post(new TwitterRetweetEvent(userNameList.toArray(new String[userNameList.size()]), getChannel()));
+            EventBus.instance().post(new TwitterRetweetEvent(userNameList.toArray(new String[userNameList.size()])));
         }
 
         /* Update DB with the last Tweet ID processed. */
@@ -308,7 +307,7 @@ public class TwitterCache implements Runnable {
 
         updateDBLong("lastid_mentions", twitterID);
         updateDBString("last_mentions", tweet);
-        EventBus.instance().post(new TwitterEvent(tweet, getChannel(), name));
+        EventBus.instance().post(new TwitterEvent(tweet, name));
     }
 
     /*
@@ -336,7 +335,7 @@ public class TwitterCache implements Runnable {
 
         updateDBLong("lastid_hometimeline", twitterID);
         updateDBString("last_hometimeline", tweet);
-        EventBus.instance().post(new TwitterEvent(tweet, getChannel()));
+        EventBus.instance().post(new TwitterEvent(tweet));
     }
 
     /*
@@ -364,7 +363,7 @@ public class TwitterCache implements Runnable {
 
         updateDBLong("lastid_usertimeline", twitterID);
         updateDBString("last_usertimeline", tweet);
-        EventBus.instance().post(new TwitterEvent(tweet, getChannel()));
+        EventBus.instance().post(new TwitterEvent(tweet));
     }
 
     /*
@@ -408,7 +407,7 @@ public class TwitterCache implements Runnable {
         }
     }
 
-    /* 
+    /*
      * Places a long into the database.
      *
      * @param  String  Database key to insert into.
@@ -426,15 +425,6 @@ public class TwitterCache implements Runnable {
      */
     private void updateDBString(String dbKey, String dbValue) {
         PhantomBot.instance().getDataStore().SetString("twitter", "", dbKey, dbValue);
-    }
-
-    /*
-     * Gets the PhantomBot channel object.
-     *
-     * @return  Channel  Channel object.
-     */
-    private Channel getChannel() {
-        return PhantomBot.getChannel(this.channel);
     }
 
     /*

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,24 @@
  */
 package tv.phantombot.event.twitch.host;
 
-import tv.phantombot.twitchwsirc.Channel;
-
 public class TwitchAutoHostedEvent extends TwitchHostEvent {
 
+    /*
+     * Class constructor.
+     *
+     * @param {String} hoster
+     */
     public TwitchAutoHostedEvent(String hoster) {
-        super(hoster, Type.HOST);
+        super(hoster);
     }
+
+    /*
+     * Class constructor.
+     *
+     * @param {String} hoster
+     * @param {int}    users
+     */
     public TwitchAutoHostedEvent(String hoster, int users) {
-        super(hoster, Type.HOST, users);
-    }
-    public TwitchAutoHostedEvent(String hoster, Channel channel) {
-        super(hoster, Type.HOST, 0, channel);
-    }
-    public TwitchAutoHostedEvent(String hoster, int users, Channel channel) {
-        super(hoster, Type.HOST, users, channel);
+        super(hoster, users);
     }
 }

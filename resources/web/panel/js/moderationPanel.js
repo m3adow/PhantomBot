@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 (function() {
     var spamTrackerLimit = 0,
         blacklist = [],
+        whitelist = [],
         currentBlacklist = null;
 
     var modSettingIcon = [];
@@ -126,11 +127,11 @@
                         //     "    </td>" +
                         //     "    <td>" + modSetting + "</td>" +
                         //     "</tr>";
-                        blacklist[i] = JSON.parse(modValue);
+                        blacklist[i] = msgObject['results'][idx];
                         html += '<tr>' +
                         '<td>' + (modSetting.length > 80 ? modSetting.substring(0, 80) + '...' : modSetting) + '</td>' +
-                        '<td style="float: right;"><button type="button" class="btn btn-default btn-xs" onclick="$.openBlackListModal(\'' + i + '\')"><i class="fa fa-pencil" /> </button>' +
-                        '<button type="button" id="delete_blackList_' + modSetting.replace(/[^a-zA-Z0-9]/ig, '_') + '" class="btn btn-default btn-xs" onclick="$.deleteBlacklist(\'' + modSetting.replace(/\\/g, '\\\\') + '\')">'+
+                        '<td style="float: right;"><button type="button" class="btn btn-default btn-xs" onclick="$.openBlackListModal(\'' + i + '\')"><i class="fa fa-edit" /> </button>' +
+                        '<button type="button" id="delete_blackList_' + i + '" class="btn btn-default btn-xs" onclick="$.deleteBlacklist(\'' + i + '\')">'+
                         '<i class="fa fa-trash" /> </button></td> ' +
                         '</tr>';
 
@@ -149,10 +150,11 @@
                         modSetting = msgObject['results'][idx]['key'];
                         modValue = msgObject['results'][idx]['value'];
 
+                        whitelist[i] = msgObject['results'][idx]['key'];
                         html += "<tr class=\"textList\">" +
                                 "    <td style=\"width: 15px\" padding=\"5px\">" +
-                                "        <div id=\"delete_whiteList_" + modSetting.replace(/[^a-z1-9]/ig, '_') + "\" type=\"button\" class=\"btn btn-default btn-xs\"" +
-                                "             onclick=\"$.deleteWhitelist('" + modSetting + "')\"><i class=\"fa fa-trash\" />" +
+                                "        <div id=\"delete_whiteList_" + i + "\" type=\"button\" class=\"btn btn-default btn-xs\"" +
+                                "             onclick=\"$.deleteWhitelist('" + i + "')\"><i class=\"fa fa-trash\" />" +
                                 "        </div>" +
                                 "    </td>" +
                                 "    <td>" + modSetting + "</td>" +
@@ -430,6 +432,12 @@
                         }
                     }
 
+                    if (panelMatch(modSetting, 'regularsModerateEmotes')) {
+                        if (panelMatch(modValue, 'false')) {
+                            $('#toggleRegularEmotes').attr('checked', 'checked');
+                        }
+                    }
+
                     if (panelMatch(modSetting, 'regularsModerateLongMsg')) {
                         if (panelMatch(modValue, 'false')) {
                             $('#toggleRegularLongMsg').attr('checked', 'checked');
@@ -475,6 +483,12 @@
                     if (panelMatch(modSetting, 'subscribersModerateColors')) {
                         if (panelMatch(modValue, 'false')) {
                             $('#toggleSubscriberColors').attr('checked', 'checked');
+                        }
+                    }
+
+                    if (panelMatch(modSetting, 'subscribersModerateEmotes')) {
+                        if (panelMatch(modValue, 'false')) {
+                            $('#toggleSubscriberEmotes').attr('checked', 'checked');
                         }
                     }
 
@@ -526,6 +540,12 @@
                         }
                     }
 
+                    if (panelMatch(modSetting, 'silentTimeoutEmotes')) {
+                        if (panelMatch(modValue, 'true')) {
+                            $('#toggleSilentTimeoutEmotes').attr('checked', 'checked');
+                        }
+                    }
+
                     if (panelMatch(modSetting, 'silentTimeoutLongMsg')) {
                         if (panelMatch(modValue, 'true')) {
                             $('#toggleSilentTimeoutLongMsg').attr('checked', 'checked');
@@ -561,7 +581,7 @@
      * @function openBlackListModal
      */
     function openBlackListModal(id) {
-        var obj = blacklist[id];
+        var obj = JSON.parse(blacklist[id]['value']);
 
         currentBlacklist = (obj.isRegex && !obj.phrase.startsWith('regex:') ? ('regex:' + String(obj.phrase)) : String(obj.phrase));
         $("#blacklistWord").val(obj.phrase);
@@ -638,13 +658,13 @@
 
     /**
      * @function deleteBlacklist
-     * @param {String} key
+     * @param {Number} id
      */
-    function deleteBlacklist(key) {
+    function deleteBlacklist(id) {
         /* this was giving errors if it contained a symbol other then _ */
-        var newkey = key.replace(/[^a-zA-Z0-9]/ig, '_');
+        var key = blacklist[id]['key'];
 
-        $("#delete_blackList_" + newkey).html("<i style=\"color: var(--main-color)\" class=\"fa fa-spinner fa-spin\" />");
+        $("#delete_blackList_" + id).html("<i style=\"color: var(--main-color)\" class=\"fa fa-spinner fa-spin\" />");
 
         sendDBDelete("commands_delblacklist_" + key, "blackList", key);
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME);
@@ -653,12 +673,12 @@
 
     /**
      * @function deleteWhitelist
-     * @param {String} key
+     * @param {Number} id
      */
-    function deleteWhitelist(key) {
-        var newkey = key.replace(/[^a-z1-9]/ig, '_');
-        $("#delete_whiteList_" + newkey).html("<i style=\"color: var(--main-color)\" class=\"fa fa-spinner fa-spin\" />");
-        sendDBDelete("commands_delwhitelist_" + newkey, "whiteList", key);
+    function deleteWhitelist(id) {
+        var key = whitelist[id];
+        $("#delete_whiteList_" + id).html("<i style=\"color: var(--main-color)\" class=\"fa fa-spinner fa-spin\" />");
+        sendDBDelete("commands_delwhitelist_" + key, "whiteList", key);
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME);
         setTimeout(function() { sendCommand("reloadmod"); }, TIMEOUT_WAIT_TIME);
     }

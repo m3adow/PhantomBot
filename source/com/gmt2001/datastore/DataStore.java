@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -317,6 +317,26 @@ public class DataStore {
         decr(fName, "", key, amount);
     }
 
+    public void decr(String fName, String key, long amount) {
+        decr(fName, "", key, amount);
+    }
+
+    public void incr(String fName, String section, String key, long amount) {
+        long ival = GetLong(fName, section, key);
+        ival += amount;
+        SetLong(fName, section, key, ival);
+    }
+
+    public void incr(String fName, String key, long amount) {
+        incr(fName, "", key, amount);
+    }
+
+    public void decr(String fName, String section, String key, long amount) {
+        long ival = GetLong(fName, section, key);
+        ival -= amount;
+        SetLong(fName, section, key, ival);
+    }
+
     public String[] searchByValue(String fName, String search) {
         return GetKeysByLikeValues(fName, "", search);
     }
@@ -333,6 +353,9 @@ public class DataStore {
 
     public Connection CreateConnection(String db, String user, String pass) {
         return null;
+    }
+    
+    public void CloseConnection() {
     }
 
     public void setAutoCommit(boolean mode) {

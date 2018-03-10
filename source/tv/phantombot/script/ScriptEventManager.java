@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 package tv.phantombot.script;
 
-import com.google.common.eventbus.Subscribe;
+import net.engio.mbassy.listener.Handler;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map.Entry;
@@ -33,8 +33,8 @@ import tv.phantombot.event.Event;
 
 public class ScriptEventManager implements Listener {
     private static final ScriptEventManager instance = new ScriptEventManager();
-    private final ConcurrentHashMap<String, EventHandler> events = new ConcurrentHashMap<>();
-    private final List<String> classes = new ArrayList<>();
+    private final ConcurrentHashMap<String, EventHandler> events = new ConcurrentHashMap<String, EventHandler>();
+    private final List<String> classes = new ArrayList<String>();
     private boolean isKilled = false;
 
     /*
@@ -65,11 +65,11 @@ public class ScriptEventManager implements Listener {
      *
      * @param {Event} event
      */
-    @Subscribe
+    @Handler
     public void onEvent(Event event) {
         if (!isKilled) {
             try {
-                String eventName = event.getClass().getName();
+                String eventName = event.getClass().getSimpleName();
                 EventHandler e = events.get(eventName);
 
                 e.handler.handle(event);
@@ -80,6 +80,16 @@ public class ScriptEventManager implements Listener {
                 com.gmt2001.Console.err.printStackTrace(ex);
             }
         }
+    }
+
+    /*
+     * Method to see if an event exists, this is used from init.js.
+     *
+     * @param  {String} eventName
+     * @return {Boolean}
+     */
+    public boolean hasEvent(String eventName) {
+        return events.containsKey((WordUtils.capitalize(eventName) + "Event"));
     }
 
     /*
@@ -102,14 +112,14 @@ public class ScriptEventManager implements Listener {
         }
 
         if (event != null) {
-            events.put(event.getName(), new EventHandler(event, handler));
+            events.put(event.getSimpleName(), new EventHandler(event, handler));
         } else {
-            throw new RuntimeException("Event class not found for: " + eventName);
+            com.gmt2001.Console.err.println("Event class not found for: " + eventName);
         }
     }
 
     /*
-     * Method to unregister an event handler
+     * Method to unregister an event handler.
      *
      * @param {ScriptEventHandler} handler
      */

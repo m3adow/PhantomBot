@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ public class H2Store extends DataStore {
         }
     }
 
-     private String sanitizeOffset(String offset) {
+    private String sanitizeOffset(String offset) {
         try {
             int intValue = Integer.parseInt(offset);
             return String.valueOf(intValue);
@@ -102,6 +102,18 @@ public class H2Store extends DataStore {
             return connection;
         } catch (SQLException ex) {
             return null;
+        }
+    }
+
+    @Override
+    public void CloseConnection() {
+        try {
+            if (connection != null) {
+                connection.close();
+                connection = null;
+            }
+        } catch (SQLException ex) {
+            com.gmt2001.Console.err.printStackTrace(ex);
         }
     }
 
@@ -255,7 +267,7 @@ public class H2Store extends DataStore {
 
             DatabaseMetaData md = connection.getMetaData();
             try (ResultSet rs = md.getTables(null, null, "PHANTOMBOT_%", null)) {
-                ArrayList<String> s = new ArrayList<>();
+                ArrayList<String> s = new ArrayList<String>();
                 while (rs.next()) {
                     s.add(rs.getString(3));
                 }
@@ -281,7 +293,7 @@ public class H2Store extends DataStore {
 
                 try (ResultSet rs = statement.executeQuery("SELECT section FROM phantombot_" + fName + " GROUP BY section;")) {
 
-                    ArrayList<String> s = new ArrayList<>();
+                    ArrayList<String> s = new ArrayList<String>();
 
                     while (rs.next()) {
                         s.add(rs.getString("section"));
@@ -312,7 +324,7 @@ public class H2Store extends DataStore {
 
                     try (ResultSet rs = statement.executeQuery()) {
 
-                        ArrayList<String> s = new ArrayList<>();
+                        ArrayList<String> s = new ArrayList<String>();
 
                         while (rs.next()) {
                             s.add(rs.getString("variable"));
@@ -329,7 +341,7 @@ public class H2Store extends DataStore {
 
                     try (ResultSet rs = statement.executeQuery()) {
 
-                        ArrayList<String> s = new ArrayList<>();
+                        ArrayList<String> s = new ArrayList<String>();
 
                         while (rs.next()) {
                             s.add(rs.getString("variable"));
@@ -375,15 +387,15 @@ public class H2Store extends DataStore {
                 try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
-    
+
                     try (ResultSet rs = statement.executeQuery()) {
-    
-                        ArrayList<String> s = new ArrayList<>();
-    
+
+                        ArrayList<String> s = new ArrayList<String>();
+
                         while (rs.next()) {
                             s.add(rs.getString("variable"));
                         }
-    
+
                         return s.toArray(new String[s.size()]);
                     }
                 } catch (SQLException ex) {
@@ -400,7 +412,7 @@ public class H2Store extends DataStore {
 
                     try (ResultSet rs = statement.executeQuery()) {
 
-                        ArrayList<String> s = new ArrayList<>();
+                        ArrayList<String> s = new ArrayList<String>();
 
                         while (rs.next()) {
                             s.add(rs.getString("variable"));
@@ -446,15 +458,15 @@ public class H2Store extends DataStore {
                 try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
-    
+
                     try (ResultSet rs = statement.executeQuery()) {
-    
-                        ArrayList<String> s = new ArrayList<>();
-    
+
+                        ArrayList<String> s = new ArrayList<String>();
+
                         while (rs.next()) {
                             s.add(rs.getString("variable"));
                         }
-    
+
                         return s.toArray(new String[s.size()]);
                     }
                 } catch (SQLException ex) {
@@ -471,7 +483,7 @@ public class H2Store extends DataStore {
 
                     try (ResultSet rs = statement.executeQuery()) {
 
-                        ArrayList<String> s = new ArrayList<>();
+                        ArrayList<String> s = new ArrayList<String>();
 
                         while (rs.next()) {
                             s.add(rs.getString("variable"));
@@ -503,7 +515,7 @@ public class H2Store extends DataStore {
                     statement.setString(2, "%" + search + "%");
 
                     try (ResultSet rs = statement.executeQuery()) {
-                        ArrayList<String> s = new ArrayList<>();
+                        ArrayList<String> s = new ArrayList<String>();
 
                         while(rs.next()) {
                             s.add(rs.getString("variable"));
@@ -519,7 +531,7 @@ public class H2Store extends DataStore {
                     statement.setString(1, "%" + search + "%");
 
                     try (ResultSet rs = statement.executeQuery()) {
-                        ArrayList<String> s = new ArrayList<>();
+                        ArrayList<String> s = new ArrayList<String>();
 
                         while(rs.next()) {
                             s.add(rs.getString("variable"));
@@ -552,7 +564,7 @@ public class H2Store extends DataStore {
                     statement.setString(2, "%" + search + "%");
 
                     try (ResultSet rs = statement.executeQuery()) {
-                        ArrayList<String> s = new ArrayList<>();
+                        ArrayList<String> s = new ArrayList<String>();
 
                         while(rs.next()) {
                             s.add(rs.getString("variable"));
@@ -568,7 +580,7 @@ public class H2Store extends DataStore {
                     statement.setString(1, search);
 
                     try (ResultSet rs = statement.executeQuery()) {
-                        ArrayList<String> s = new ArrayList<>();
+                        ArrayList<String> s = new ArrayList<String>();
 
                         while(rs.next()) {
                             s.add(rs.getString("variable"));
@@ -587,7 +599,7 @@ public class H2Store extends DataStore {
                };
     }
 
-     @Override
+    @Override
     public String[] GetKeysByLikeKeysOrder(String fName, String section, String search, String order, String limit, String offset) {
         CheckConnection();
 
@@ -596,16 +608,16 @@ public class H2Store extends DataStore {
         limit = sanitizeLimit(limit);
         offset = sanitizeOffset(offset);
 
-        if (FileExists(fName)) { 
+        if (FileExists(fName)) {
             if (section.length() > 0) {
                 try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? AND variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + " OFFSET " + offset + ";")) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
                     statement.setString(2, "%" + search + "%");
-                    
+
                     try (ResultSet rs = statement.executeQuery()) {
-                        ArrayList<String> s = new ArrayList<>();
-                        
+                        ArrayList<String> s = new ArrayList<String>();
+
                         while(rs.next()) {
                             s.add(rs.getString("variable"));
                         }
@@ -618,10 +630,10 @@ public class H2Store extends DataStore {
                 try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + " OFFSET " + offset + ";")) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, "%" + search + "%");
-                    
+
                     try (ResultSet rs = statement.executeQuery()) {
-                        ArrayList<String> s = new ArrayList<>();
-                        
+                        ArrayList<String> s = new ArrayList<String>();
+
                         while(rs.next()) {
                             s.add(rs.getString("variable"));
                         }
@@ -664,7 +676,7 @@ public class H2Store extends DataStore {
             } catch (SQLException ex) {
                 com.gmt2001.Console.err.printStackTrace(ex);
             }
-       } else {
+        } else {
             try (PreparedStatement statement = connection.prepareStatement("SELECT value FROM phantombot_" + fName + " WHERE variable=?;")) {
                 statement.setQueryTimeout(10);
                 statement.setString(1, key);

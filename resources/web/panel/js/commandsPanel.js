@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  */
 
 /*
- * customCommandsPanel.js
+ * commandsPanel.js
  * Drives the Custom Commands Panel
  */
 (function() {
@@ -71,6 +71,7 @@
 
             if (panelCheckQuery(msgObject, 'commands_cooldown')) {
                 html = "<table>";
+                msgObject['results'].sort(sortCommandTable);
                 for (idx in msgObject['results']) {
                     commandName = msgObject['results'][idx]['key'];
                     time = JSON.parse(msgObject['results'][idx]['value']).seconds;
@@ -81,7 +82,7 @@
                     '    <td style="vertical-align: middle">' +
                     '        <form onkeypress="return event.keyCode != 13">' +
                     '            <input style="width: 95%" type="text" data-toggle="tooltip" title="Click to edit the cooldown." onclick="$.editCooldown(\'' + commandName + '\', \'' + time + '\', \''+ JSON.parse(msgObject['results'][idx]['value']).isGlobal+ '\')"' +
-                    '                       id="editCommandCooldown_' + commandName.replace(/[^a-zA-Z0-9_]/g, '_SP_') + '"' +
+                    '                       class="input-control" id="editCommandCooldown_' + commandName.replace(/[^a-zA-Z0-9_]/g, '_SP_') + '"' +
                     '                   value="' + time + ' seconds. (Global: ' + JSON.parse(msgObject['results'][idx]['value']).isGlobal + ')" />' +
                     '              <button style="float: right;" type="button" class="btn btn-default btn-xs" id="deleteCooldown_' + commandName + '" onclick="$.deleteCooldown(\'' + commandName + '\')"><i class="fa fa-trash" /> </button>' +
                     '             </form>' +
@@ -138,6 +139,7 @@
 
                 html = '<table>';
                 commands.splice(0);
+                msgObject['results'].sort(sortCommandTable);
                 for (var idx in msgObject['results']) {
                     commandName = msgObject['results'][idx]['key'];
                     commandNameSafe = commandName.replace(/\?/g, '__QM__');
@@ -150,7 +152,7 @@
                             '        <form onkeypress="return event.keyCode != 13">' +
                             '            <input style="width: 85%" type="text" class="input-control" id="editCommand_' + commandNameSafe.replace(/[^a-zA-Z0-9_]/g, '_SP_')  + '"' +
                             '                   value="' + commandValue + '" />' +
-                            '              <button type="button" class="btn btn-default btn-xs" onclick="$.editCustomCommand(\'' + commandName + '\')"><i class="fa fa-pencil" /> </button> ' +
+                            '              <button type="button" class="btn btn-default btn-xs" onclick="$.editCustomCommand(\'' + commandName + '\')"><i class="fa fa-hdd-o" /> </button> ' +
                             '              <button type="button" class="btn btn-default btn-xs" id="deleteCommand_' + commandNameSafe.replace(/[^a-zA-Z0-9_]/g, '_SP_') + '" onclick="$.deleteCommand(\'' + commandName + '\')"><i class="fa fa-trash" /> </button>' +
                             '             </form>' +
                             '        </form>' +
@@ -167,6 +169,8 @@
                     $('#aliasCommandsList').html('<i>There are no aliased commands defined.</i>');
                     return;
                 }
+
+                msgObject['results'].sort(sortCommandTable);
                 for (idx in msgObject['results']) {
                     commandName = msgObject['results'][idx]['key'];
                     commandValue = msgObject['results'][idx]['value'];
@@ -191,6 +195,7 @@
                     $('#priceCommandsList').html('<i>There are no commands with prices defined.</i>');
                     return;
                 }
+                msgObject['results'].sort(sortCommandTable);
                 for (idx in msgObject['results']) {
                     commandName = msgObject['results'][idx]['key'];
                     commandValue = msgObject['results'][idx]['value'];
@@ -200,7 +205,7 @@
                     '        <form onkeypress="return event.keyCode != 13">' +
                     '            <input style="width: 60%" type="text" class="input-control" id="editCommandPrice_' + commandName.replace(/[^a-zA-Z0-9_]/g, '_SP_') + '"' +
                     '                   value="' + commandValue + '" />' +
-                    '              <button type="button" class="btn btn-default btn-xs" onclick="$.updateCommandPrice(\'' + commandName + '\')"><i class="fa fa-pencil" /> </button> ' +
+                    '              <button type="button" class="btn btn-default btn-xs" onclick="$.updateCommandPrice(\'' + commandName + '\')"><i class="fa fa-hdd-o" /> </button> ' +
                     '              <button type="button" class="btn btn-default btn-xs" id="deleteCommandPrice_' + commandName.replace(/[^a-zA-Z0-9_]/g, '_SP_') + '" onclick="$.deleteCommandPrice(\'' + commandName + '\')"><i class="fa fa-trash" /> </button>' +
                     '             </form>' +
                     '        </form>' +
@@ -217,6 +222,7 @@
                     $('#payCommandsList').html('<i>There are no commands with payments defined.</i>');
                     return;
                 }
+                msgObject['results'].sort(sortCommandTable);
                 for (idx in msgObject['results']) {
                     commandName = msgObject['results'][idx]['key'];
                     commandValue = msgObject['results'][idx]['value'];
@@ -226,7 +232,7 @@
                     '        <form onkeypress="return event.keyCode != 13">' +
                     '            <input style="width: 60%" type="text" class="input-control" id="editCommandPay_' + commandName.replace(/[^a-zA-Z0-9_]/g, '_SP_') + '"' +
                     '                   value="' + commandValue + '" />' +
-                    '              <button type="button" class="btn btn-default btn-xs" onclick="$.updateCommandPay(\'' + commandName + '\')"><i class="fa fa-pencil" /> </button> ' +
+                    '              <button type="button" class="btn btn-default btn-xs" onclick="$.updateCommandPay(\'' + commandName + '\')"><i class="fa fa-hdd-o" /> </button> ' +
                     '              <button type="button" class="btn btn-default btn-xs" id="deleteCommandPay_' + commandName.replace(/[^a-zA-Z0-9_]/g, '_SP_') + '" onclick="$.deleteCommandPay(\'' + commandName + '\')"><i class="fa fa-trash" /> </button>' +
                     '             </form>' +
                     '        </form>' +
@@ -393,7 +399,7 @@
             $('#addCommandText').val('');
             setTimeout(function() { $('#addCommandCommand').val(''); }, TIMEOUT_WAIT_TIME * 10);
             return;
-        } else if (botCommands.indexOf(command) !== -1) {
+        } else if (botCommands.indexOf(command.replace('!', '')) !== -1) {
             $('#addCommandCommand').val('[ERROR] Command already exists.');
             $('#addCommandText').val('');
             setTimeout(function() { $('#addCommandCommand').val(''); }, TIMEOUT_WAIT_TIME * 10);
@@ -555,7 +561,6 @@
         } else if (cooldownMsg == "false") {
             sendDBUpdate("commands_cooldownmsg", "settings", "coolDownMsgEnabled", "true");
         }
-        sendCommand('reloadinit');
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME * 2);
     };
 
@@ -569,7 +574,6 @@
         } else if (permcomMsg == "false") {
             sendDBUpdate("commands_permcommsg", "settings", "permComMsgEnabled", "true");
         }
-        sendCommand('reloadinit');
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME * 2);
     };
 
@@ -582,18 +586,20 @@
             sendDBUpdate("commands_cooldown_toggle", "cooldownSettings", "modCooldown", "false");
         } else if (modCooldown == "false") {
             sendDBUpdate("commands_cooldown_toggle", "cooldownSettings", "modCooldown", "true");
+
         }
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME * 2);
-        setTimeout(function() { sendCommand("reloadcooldown"); }, TIMEOUT_WAIT_TIME * 2);
+        setTimeout(function() { sendWSEvent('cooldown', './core/commandCoolDown.js', null, ['update']); }, TIMEOUT_WAIT_TIME * 2);
     };
 
     /**
      * @function setGlobalCooldownTime
      */
     function setDefaultCooldown() {
-        var newValue = $("#defaultCooldownInput").val();
-        if (newValue.length > 0) {
+        var newValue = parseInt($("#defaultCooldownInput").val());
+        if (!isNaN(newValue) && newValue >= 5) {
             sendDBUpdate("commands_cooldown_time", "cooldownSettings", "defaultCooldownTime", String(newValue));
+            setTimeout(function() { sendWSEvent('cooldown', './core/commandCoolDown.js', null, ['update']); }, TIMEOUT_WAIT_TIME * 2);
             setTimeout(function() { doQuery();  }, TIMEOUT_WAIT_TIME * 2);
         }
     }

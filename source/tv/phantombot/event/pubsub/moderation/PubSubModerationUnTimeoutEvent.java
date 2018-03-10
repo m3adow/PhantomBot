@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,11 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package tv.phantombot.event.pubsub;
+package tv.phantombot.event.pubsub.moderation;
 
 public class PubSubModerationUnTimeoutEvent extends PubSubModerationEvent {
 
-	public PubSubModerationUnTimeoutEvent(String username, String creator) {
-		super(username, creator, null);
-	}
+    /*
+     * Class constructor
+     *
+     * @param {String} username
+     * @param {String} creator
+     */
+    public PubSubModerationUnTimeoutEvent(String username, String creator) {
+        super(username, creator, null);
+    }
 }

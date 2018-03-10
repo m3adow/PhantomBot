@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
 package tv.phantombot.event.streamtip.donate;
 
 import tv.phantombot.event.streamtip.StreamTipEvent;
-import tv.phantombot.twitchwsirc.Channel;
 
 public class StreamTipDonationInitializedEvent extends StreamTipEvent {
 
+    /*
+     * Class constructor.
+     */
     public StreamTipDonationInitializedEvent() {
-    }
 
-    public StreamTipDonationInitializedEvent(Channel channel) {
-        super(channel);
     }
 }

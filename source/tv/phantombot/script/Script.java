@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,12 +32,13 @@ public class Script {
     public static final NativeObject global = new NativeObject();
     @SuppressWarnings("rawtypes")
     private final List<ScriptDestroyable> destroyables = Lists.newArrayList();
-    private final NativeObject vars = new NativeObject();
+    private static final NativeObject vars = new NativeObject();
     private final File file;
     private long lastModified;
     private Context context;
     private boolean killed = false;
     private int fileNotFoundCount = 0;
+    private static ScriptableObject scope;
 
     @SuppressWarnings("CallToThreadStartDuringObjectConstruction")
     public Script(File file) {
@@ -51,6 +52,12 @@ public class Script {
                 ScriptFileWatcher.instance().addScript(this);
             }
         }
+    }
+
+    public static String callMethod(String method, String arg) {
+        Object[] obj = new Object[] {arg};
+
+        return scope.callMethod(global, method, obj).toString();
     }
 
     @SuppressWarnings("rawtypes")
@@ -134,6 +141,11 @@ public class Script {
             return;
         }
 
+        /* macOS user reported errors loading ._ files. Could be from text editor. */
+        if (file.getName().startsWith("._")) {
+            return;
+        }
+
         /* Enable Error() in JS to provide an object with fileName and lineNumber. */
         final ContextFactory ctxFactory = new ContextFactory() {
             @Override
@@ -162,11 +174,10 @@ public class Script {
             context.setOptimizationLevel(9);
         }
 
-        ScriptableObject scope = context.initStandardObjects(global, false);
-        scope.defineProperty("$", global, 0);
+        scope = context.initStandardObjects(vars, false);//Normal scripting object.
+        scope.defineProperty("$", global, 0);// Global functions that can only be accessed and replaced with $.
         scope.defineProperty("$api", ScriptApi.instance(), 0);
         scope.defineProperty("$script", this, 0);
-        scope.defineProperty("$var", vars, 0);
 
         /* Configure debugger. */
         if (PhantomBot.enableRhinoDebugger) {

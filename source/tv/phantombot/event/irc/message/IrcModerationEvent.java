@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,31 @@
 package tv.phantombot.event.irc.message;
 
 import java.util.Map;
-import tv.phantombot.twitchwsirc.Channel;
-import tv.phantombot.twitchwsirc.Session;
+
+import tv.phantombot.twitchwsirc.chat.Session;
 
 public class IrcModerationEvent extends IrcMessageEvent {
 
-    public IrcModerationEvent(Session session, String sender, String message, Channel channel) {
-        super(session, sender, message, null, channel);
+    /*
+     * Class constructor.
+     *
+     * @param {Session} session
+     * @param {String}  sender
+     * @param {String}  message
+     */
+    public IrcModerationEvent(Session session, String sender, String message) {
+        super(session, sender, message);
     }
 
-    public IrcModerationEvent(Session session, String sender, String message, Channel channel, Map<String, String> tags) {
-        super(session, sender, message, tags, channel);
+    /*
+     * Class constructor.
+     *
+     * @param {Session} session
+     * @param {String}  sender
+     * @param {String}  message
+     * @param {Map}     tags
+     */
+    public IrcModerationEvent(Session session, String sender, String message, Map<String, String> tags) {
+        super(session, sender, message, tags);
     }
 }

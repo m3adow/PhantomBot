@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,22 +16,24 @@
  */
 package tv.phantombot.event.ytplayer;
 
-import tv.phantombot.twitchwsirc.Channel;
-
 public class YTPlayerSongRequestEvent extends YTPlayerEvent {
-
     private final String search;
 
+    /*
+     * Class constructor.
+     *
+     * @param {String} search
+     */
     public YTPlayerSongRequestEvent(String search) {
         this.search = search;
     }
 
-    public YTPlayerSongRequestEvent(String search, Channel channel) {
-        super(channel);
-        this.search = search;
-    }
-
+    /*
+     * Method that returns the user's search.
+     *
+     * @return {String} search
+     */
     public String getSearch() {
-        return search;
+        return this.search;
     }
 }

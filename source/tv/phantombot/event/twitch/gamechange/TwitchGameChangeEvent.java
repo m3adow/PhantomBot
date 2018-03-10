@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +17,25 @@
 package tv.phantombot.event.twitch.gamechange;
 
 import tv.phantombot.event.twitch.TwitchEvent;
-import tv.phantombot.twitchwsirc.Channel;
 
 public class TwitchGameChangeEvent extends TwitchEvent {
-
     private final String gameTitle;
-    private final Channel channel;
 
+    /*
+     * Class constructor.
+     *
+     * @param {String} gameTitle
+     */
     public TwitchGameChangeEvent(String gameTitle) {
         this.gameTitle = gameTitle;
-        this.channel = null;
     }
 
-    public TwitchGameChangeEvent(String gameTitle, Channel channel) {
-        this.gameTitle = gameTitle;
-        this.channel = channel;
-    }
-
+    /*
+     * Method that returns the game name
+     *
+     * @return {String} gameTitle
+     */
     public String getGameTitle() {
         return this.gameTitle;
     }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@ package tv.phantombot.event.webpanel;
 
 public class WebPanelSocketConnectedEvent extends WebPanelSocketEvent {
 
-	public WebPanelSocketConnectedEvent() {
-	}
+    /*
+     * Class constructor.
+     */
+    public WebPanelSocketConnectedEvent() {
+
+    }
 }

@@ -1,11 +1,11 @@
 :root {
     --header-background: #6441a5;
-    --main-background: #201c2b;
+    --main-background: #1c1c24;
     --main-color: #6136b1;
     --ui-widget-content-border: #6136b1;
-    --ui-widget-content-background: #6136b1;
-    --ui-tabs-background: #19171c;
-    --ui-tabs-active-background: #6136b1;
+    --ui-widget-content-background: #6441a5;
+    --ui-tabs-background: #1c1c24;
+    --ui-tabs-active-background: #6441a5;
     --ui-state-hover-border: #6136b1;
     --ui-state-hover-background: #383838;
     --hyperlinks: #6441a5;
@@ -64,6 +64,12 @@ body {
     padding: 0;
     margin: 0;
     background: var(--main-background);
+}
+
+textarea {
+    resize: vertical;
+    max-height: 300px;
+    min-height: 50px;
 }
 
 .textList {
@@ -793,6 +799,10 @@ input, textarea {
     -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
     -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
     transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+
+form-control {
+    margin-bottom: 5px;
 }
 
 /* Overrides for FooTable */

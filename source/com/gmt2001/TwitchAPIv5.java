@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,12 +31,14 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONStringer;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Communicates with Twitch Kraken server using the version 5 API
  *
  * @author gmt2001
- * @author illusionaryone 
+ * @author illusionaryone
  */
 public class TwitchAPIv5 {
 
@@ -188,7 +190,7 @@ public class TwitchAPIv5 {
     private String getIDFromChannel(String channel) {
         return UsernameCache.instance().getID(channel);
     }
-    
+
 
     /**
      * Gets a channel object
@@ -298,6 +300,33 @@ public class TwitchAPIv5 {
         return GetData(request_type.PUT, base_url + "/channels/" + getIDFromChannel(channel), j.toString(), oauth, true);
     }
 
+    /*
+     * Updates the channel communities.
+     */
+    public JSONObject UpdateCommunities(String channel, String[] communities) {
+        JSONObject j = new JSONObject("{}");
+        List<String> c = new ArrayList<String>();
+
+        if (communities.length < 1) {
+            j.put("community_ids", c.toArray(new String[c.size()]));
+            return GetData(request_type.PUT, base_url + "/channels/" + getIDFromChannel(channel) + "/communities", j.toString(), oauth, true);
+        }
+
+        for (String community : communities) {
+            JSONObject o = GetCommunityID(community);
+            if (o.getBoolean("_success") && o.getInt("_http") == 200) {
+                c.add(o.getString("_id"));
+            }
+        }
+
+        j.put("community_ids", c.toArray(new String[c.size()]));
+
+        return GetData(request_type.PUT, base_url + "/channels/" + getIDFromChannel(channel) + "/communities", j.toString(), oauth, true);
+    }
+
+    /*
+     * Searches for a game.
+     */
     public JSONObject SearchGame(String game) {
         try {
             String url = base_url + "/search/games?q=" + URLEncoder.encode(game, "UTF-8") + "&type=suggest";
@@ -308,6 +337,13 @@ public class TwitchAPIv5 {
             com.gmt2001.Console.err.println(ex.getClass().getName() + ": " + ex.getMessage());
             return j;
         }
+    }
+
+    /*
+     * Gets a communities id.
+     */
+    public JSONObject GetCommunityID(String name) {
+        return GetData(request_type.GET, base_url + "/communities?name=" + name, false);
     }
 
     /**
@@ -374,6 +410,16 @@ public class TwitchAPIv5 {
      */
     public JSONObject GetStreams(String channels) {
         return GetData(request_type.GET, base_url + "/streams?channel=" + channels, false);
+    }
+
+    /**
+     * Gets the communities object array.
+     *
+     * @param channel
+     * @return
+     */
+    public JSONObject GetCommunities(String channel) {
+        return GetData(request_type.GET, base_url + "/channels/" + getIDFromChannel(channel) + "/communities", false);
     }
 
     /**
@@ -546,6 +592,31 @@ public class TwitchAPIv5 {
             return jsonInput.getString("created_at");
         }
         return "ERROR";
+    }
+
+    /**
+      * Checks to see if the bot account is verified by Twitch.
+      *
+      * @param  channel
+      * @return boolean  true if verified
+      */
+    public boolean getBotVerified(String channel) {
+        JSONObject jsonInput = GetData(request_type.GET, base_url + "/users/" + getIDFromChannel(channel) + "/chat", false);
+        if (jsonInput.has("is_verified_bot")) {
+            return jsonInput.getBoolean("is_verified_bot");
+        }
+        return false;
+    }
+
+    /**
+     * Get the clips from today for a channel.
+     *
+     * @param channel
+     * @return JSONObject  clips object.
+     */
+    public JSONObject getClipsToday(String channel) {
+        /* Yes, the v5 endpoint for this does use the Channel Name and not the ID. */
+        return GetData(request_type.GET, base_url + "/clips/top?channel=" + channel + "&limit=100&period=day", false);
     }
 
     /**

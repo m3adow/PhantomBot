@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,23 +33,23 @@ import sx.blah.discord.util.EmbedBuilder;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import java.io.FileNotFoundException;
 import java.io.File;
-
-import java.time.LocalDateTime;
 
 import java.awt.Color;
 
 /*
  * Has all of the methods to work with Discord4J.
  *
- * @author Illusionaryone
+ * @author IllusionaryOne
  * @author ScaniaTV
  */
 public class DiscordUtil {
-	/*
+    /*
      * Method to send a message to a channel.
      *
      * @param {IChannel} channel
@@ -62,7 +62,10 @@ public class DiscordUtil {
                     com.gmt2001.Console.out.println("[DISCORD] [#" + channel.getName() + "] [CHAT] " + message);
 
                     channel.sendMessage(message);
+                    return;
                 }
+                // Throw this if the channel object is null.
+                throw new DiscordException("Failed to send message due to the channel object being null.");
             } catch (MissingPermissionsException | DiscordException ex) {
                 com.gmt2001.Console.err.println("Failed to send a message: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
             }
@@ -91,8 +94,11 @@ public class DiscordUtil {
                 if (user != null) {
                     com.gmt2001.Console.out.println("[DISCORD] [@" + user.getName().toLowerCase() + "#" + user.getDiscriminator() + "] [DM] " + message);
 
-                    user.getOrCreatePMChannel().sendMessage(message);  
+                    user.getOrCreatePMChannel().sendMessage(message);
+                    return;
                 }
+                // Throw this if the user object is null.
+                throw new DiscordException("Failed to send private message due to the user being null.");
             } catch (MissingPermissionsException | DiscordException ex) {
                 com.gmt2001.Console.err.println("Failed to send a private message: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
             }
@@ -112,21 +118,57 @@ public class DiscordUtil {
     /*
      * Method to send embed messages.
      *
+     * @param {IChannel}     channel
+     * @param {EmbedObject} EmbedBuilder
+     */
+    public void sendMessageEmbed(IChannel channel, EmbedObject builder) {
+        RequestBuffer.request(() -> {
+            try {
+                if (channel != null && builder != null) {
+                    com.gmt2001.Console.out.println("[DISCORD] [#" + channel.getName() + "] [EMBED] ");
+
+                    channel.sendMessage(builder);
+                    return;
+                }
+                // Throw this if the channel and builder object is null.
+                throw new DiscordException("Failed to send embed message due to either the channel or builder being null.");
+            } catch (MissingPermissionsException | DiscordException | IllegalArgumentException ex) {
+                com.gmt2001.Console.err.println("Failed to send an embed message: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
+            }
+        });
+    }
+
+    /*
+     * Method to send embed messages.
+     *
+     * @param {String} channelName
+     * @param {EmbedObject} bulder
+     */
+    public void sendMessageEmbed(String channelName, EmbedObject builder) {
+        sendMessageEmbed(getChannel(channelName), builder);
+    }
+
+    /*
+     * Method to send embed messages.
+     *
      * @param {IChannel} channel
      * @param {String}   message
      * @param {String}   color
      */
-    public void sendMessageEmbed(IChannel channel, String message, String color) {
-        EmbedObject builder = new EmbedBuilder().withDescription(message).withColor(getColor(color)).build();
-
+    public void sendMessageEmbed(IChannel channel, String color, String message) {
         RequestBuffer.request(() -> {
             try {
+                EmbedObject builder = new EmbedBuilder().withDescription(message).withColor(getColor(color)).build();
+
                 if (channel != null) {
                     com.gmt2001.Console.out.println("[DISCORD] [#" + channel.getName() + "] [EMBED] " + message);
 
                     channel.sendMessage(builder);
+                    return;
                 }
-            } catch (MissingPermissionsException | DiscordException ex) {
+                // Throw this if the channel object is null.
+                throw new DiscordException("Failed to send embed message due to the channel being null.");
+            } catch (MissingPermissionsException | DiscordException | IllegalArgumentException ex) {
                 com.gmt2001.Console.err.println("Failed to send an embed message: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
             }
         });
@@ -139,8 +181,8 @@ public class DiscordUtil {
      * @param {String} message
      * @param {String} color
      */
-    public void sendMessageEmbed(String channelName, String message, String color) {
-        sendMessageEmbed(getChannel(channelName), message, color);
+    public void sendMessageEmbed(String channelName, String color, String message) {
+        sendMessageEmbed(getChannel(channelName), color, message);
     }
 
     /*
@@ -161,7 +203,10 @@ public class DiscordUtil {
                     } else {
                         channel.sendFile(message, new File(fileLocation));
                     }
+                    return;
                 }
+                // Throw this if the channel object is null.
+                throw new DiscordException("Failed to send file message due to the channel being null.");
             } catch (MissingPermissionsException | DiscordException | FileNotFoundException ex) {
                 com.gmt2001.Console.err.println("Failed to upload a file: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
             }
@@ -196,10 +241,27 @@ public class DiscordUtil {
      * @return {IChannel}
      */
     public IChannel getChannel(String channelName) {
-        List<IChannel> channels = DiscordAPI.guild.getChannelsByName(channelName);
+        List<IChannel> channels = DiscordAPI.getGuild().getChannels();
 
         for (IChannel channel : channels) {
-            if (channel.getName().equals(channelName)) {
+            if (channel.getName().equalsIgnoreCase(channelName)) {
+                return channel;
+            }
+        }
+        return null;
+    }
+
+    /*
+     * Method to return a channel object by its ID.
+     *
+     * @param  {String} channelId
+     * @return {IChannel}
+     */
+    public IChannel getChannelByID(String channelId) {
+        List<IChannel> channels = DiscordAPI.getGuild().getChannels();
+
+        for (IChannel channel : channels) {
+            if (channel.getStringID().equals(channelId)) {
                 return channel;
             }
         }
@@ -213,10 +275,27 @@ public class DiscordUtil {
      * @return {IUser}
      */
     public IUser getUser(String userName) {
-        List<IUser> users = DiscordAPI.guild.getUsersByName(userName, true);
+        List<IUser> users = DiscordAPI.getGuild().getUsers();
 
         for (IUser user : users) {
-            if (user.getDisplayName(DiscordAPI.guild).equals(userName)) {
+            if (user.getDisplayName(DiscordAPI.getGuild()).equalsIgnoreCase(userName)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    /*
+     * Method to return a user object by its id.
+     *
+     * @param  {Long} userId
+     * @return {IUser}
+     */
+    public IUser getUserById(long userId) {
+        List<IUser> users = DiscordAPI.getGuild().getUsers();
+
+        for (IUser user : users) {
+            if (user.getLongID() == userId) {
                 return user;
             }
         }
@@ -231,10 +310,10 @@ public class DiscordUtil {
      * @return {IUser}
      */
     public IUser getUserWithDiscriminator(String userName, String discriminator) {
-        List<IUser> users = DiscordAPI.guild.getUsersByName(userName, true);
+        List<IUser> users = DiscordAPI.getGuild().getUsersByName(userName, true);
 
         for (IUser user : users) {
-            if (user.getDisplayName(DiscordAPI.guild).equals(userName) && user.getDiscriminator().equals(discriminator)) {
+            if (user.getDisplayName(DiscordAPI.getGuild()).equalsIgnoreCase(userName) && user.getDiscriminator().equalsIgnoreCase(discriminator)) {
                 return user;
             }
         }
@@ -248,14 +327,80 @@ public class DiscordUtil {
      * @return {IRole}
      */
     public IRole getRole(String roleName) {
-        List<IRole> roles = DiscordAPI.guild.getRolesByName(roleName);
+        List<IRole> roles = DiscordAPI.getClient().getRoles();
 
         for (IRole role : roles) {
-            if (role.getName().equals(roleName)) {
+            if (role.getName().equalsIgnoreCase(roleName)) {
                 return role;
             }
         }
         return null;
+    }
+
+    /*
+     * Method to get an array of role objects by a string of role names.
+     *
+     * @param  {String[]} roles
+     * @return {IRole[]}
+     */
+    public IRole[] getRoleObjects(String[] roles) {
+        IRole[] list = new IRole[roles.length];
+
+        for (int i = 0; i < roles.length; i++) {
+            list[i] = getRole(roles[i]);
+        }
+        return list;
+    }
+
+    /*
+     * Method to get a list of a user's roles.
+     *
+     * @param  {IUser} user
+     * @return {List}
+     */
+    public IRole[] getUserRoles(IUser user) {
+        List<IRole> roles = (user == null ? new ArrayList<IRole>() : DiscordAPI.getGuild().getRolesForUser(user));
+
+        return (roles.size() < 1 ? new IRole[0] : roles.toArray(new IRole[roles.size()]));
+    }
+
+    /*
+     * Method to get a list of a user's roles.
+     *
+     * @param  {String} userId
+     * @return {List}
+     */
+    public IRole[] getUserRoles(String userId) {
+        return getUserRoles(getUserById(Long.parseUnsignedLong(userId)));
+    }
+
+    /*
+     * Method to edit roles on a user, multiple can be set at once to replace the current ones.
+     *
+     * @param {IUser}   user
+     * @param {IRole[]} roles
+     */
+    public void editUserRoles(IUser user, IRole[] roles) {
+        RequestBuffer.request(() -> {
+            try {
+                if (roles != null && user != null) {
+                    DiscordAPI.getGuild().editUserRoles(user, roles);
+                    return;
+                }
+            } catch (MissingPermissionsException | DiscordException ex) {
+                com.gmt2001.Console.err.println("Failed to edit roles on user: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
+            }
+        });
+    }
+
+    /*
+     * Method to edit roles on a user, multiple can be set at once to replace the current ones.
+     *
+     * @param {String}  userId
+     * @param {IRole[]} roles
+     */
+    public void editUserRoles(String userId, IRole[] roles) {
+        editUserRoles(getUserById(Long.parseUnsignedLong(userId)), roles);
     }
 
     /*
@@ -269,6 +414,7 @@ public class DiscordUtil {
             try {
                 if (role != null && user != null) {
                     user.addRole(role);
+                    return;
                 }
             } catch (MissingPermissionsException | DiscordException ex) {
                 com.gmt2001.Console.err.println("Failed to add role on user: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
@@ -287,6 +433,16 @@ public class DiscordUtil {
     }
 
     /*
+     * Method to set a role on a user.
+     *
+     * @param {String} roleName
+     * @param {IUser} user
+     */
+    public void addRole(String roleName, IUser user) {
+        addRole(getRole(roleName), user);
+    }
+
+    /*
      * Method to remove a role on a user.
      *
      * @param {IRole} role
@@ -297,6 +453,7 @@ public class DiscordUtil {
             try {
                 if (role != null && user != null) {
                     user.removeRole(role);
+                    return;
                 }
             } catch (MissingPermissionsException | DiscordException ex) {
                 com.gmt2001.Console.err.println("Failed to remove role on user: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
@@ -313,20 +470,21 @@ public class DiscordUtil {
     public void removeRole(String roleName, String userName) {
         removeRole(getRole(roleName), getUser(userName));
     }
-    
+
     /*
      * Method to create a new role.
      *
      * @param {String} roleName
      */
     public void createRole(String roleName) {
-    	RequestBuffer.request(() -> {
-    		try {
-    			DiscordAPI.guild.createRole().changeName(roleName);
-    		} catch (MissingPermissionsException | DiscordException ex) {
-    			com.gmt2001.Console.err.println("Failed to create role: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
-    		}
-    	});
+        RequestBuffer.request(() -> {
+            try {
+                DiscordAPI.getGuild().createRole().changeName(roleName);
+                return;
+            } catch (MissingPermissionsException | DiscordException ex) {
+                com.gmt2001.Console.err.println("Failed to create role: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
+            }
+        });
     }
 
     /*
@@ -335,15 +493,16 @@ public class DiscordUtil {
      * @param {IRole} role
      */
     public void deleteRole(IRole role) {
-    	RequestBuffer.request(() -> {
-    		try {
-    			if (role != null) {
-    				role.delete();
-    			}
-    		} catch (MissingPermissionsException | DiscordException ex) {
-    			com.gmt2001.Console.err.println("Failed to delete role: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
-    		}
-    	});
+        RequestBuffer.request(() -> {
+            try {
+                if (role != null) {
+                    role.delete();
+                    return;
+                }
+            } catch (MissingPermissionsException | DiscordException ex) {
+                com.gmt2001.Console.err.println("Failed to delete role: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
+            }
+        });
     }
 
     /*
@@ -352,7 +511,7 @@ public class DiscordUtil {
      * @param {String} roleName
      */
     public void deleteRole(String roleName) {
-    	deleteRole(getRole(roleName));
+        deleteRole(getRole(roleName));
     }
 
     /*
@@ -362,10 +521,7 @@ public class DiscordUtil {
      * @return {Boolean}
      */
     public boolean isAdministrator(IUser user) {
-        if (user != null) {
-            return user.getPermissionsForGuild(DiscordAPI.guild).contains(Permissions.ADMINISTRATOR);
-        }
-        return false;
+        return (user != null ? user.getPermissionsForGuild(DiscordAPI.getGuild()).contains(Permissions.ADMINISTRATOR) : false);
     }
 
     /*
@@ -389,21 +545,19 @@ public class DiscordUtil {
         // So start this on a new thread to avoid that. Please note that you need to delete at least 2 messages.
 
         if (channel != null) {
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    RequestBuffer.request(() -> {
-                        try {
-                            List<IMessage> messages = channel.getMessageHistoryFrom(LocalDateTime.now(), (amount < 2 ? 2 : amount));
-                        
-                            channel.bulkDelete(messages);
-                        } catch (DiscordException ex) {
-                            com.gmt2001.Console.err.println("Failed to bulk delete messages: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
-                        }
-                    });
-                }
+            Thread thread = new Thread(() -> {
+                RequestBuffer.request(() -> {
+                    try {
+                        List<IMessage> messages = channel.getMessageHistory(amount < 2 ? 2 : amount);
+
+                        channel.bulkDelete(messages);
+                        return;
+                    } catch (DiscordException ex) {
+                        com.gmt2001.Console.err.println("Failed to bulk delete messages: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
+                    }
+                });
             }, "tv.phantombot.discord.util.DiscordUtil::bulkDelete");
-    
+
             thread.start();
         }
     }
@@ -419,12 +573,52 @@ public class DiscordUtil {
     }
 
     /*
+     * Method to bulk delete messages from a channel.
+     *
+     * @param {IChannel} channel
+     * @param {Array}   list
+     */
+    public void bulkDeleteMessages(IChannel channel, IMessage[] list) {
+        if (channel != null) {
+            RequestBuffer.request(() -> {
+                try {
+                    List<IMessage> messages = Arrays.asList(list);
+
+                    channel.bulkDelete(messages);
+                    return;
+                } catch (DiscordException ex) {
+                    com.gmt2001.Console.err.println("Failed to bulk delete messages: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
+                }
+            });
+        }
+    }
+
+    /*
+     * Method to bulk delete messages from a channel.
+     *
+     * @param {String} channelName
+     * @param {Array} messages
+     */
+    public void bulkDeleteMessages(String channelName, IMessage[] messages) {
+        bulkDeleteMessages(getChannel(channelName), messages);
+    }
+
+    /*
+     * Method to delete a message.
+     *
+     * @param {IMessage} message
+     */
+    public void deleteMessage(IMessage message) {
+        message.delete();
+    }
+
+    /*
      * Method to set the current game.
      *
      * @param {String} game
      */
     public void setGame(String game) {
-        DiscordAPI.shard.changePlayingText(game);
+        DiscordAPI.getShard().changePlayingText(game);
     }
 
     /*
@@ -434,7 +628,7 @@ public class DiscordUtil {
      * @param {String} url
      */
     public void setStream(String game, String url) {
-        DiscordAPI.shard.streaming(game, url);
+        DiscordAPI.getShard().streaming(game, url);
     }
 
     /*
@@ -442,7 +636,14 @@ public class DiscordUtil {
      *
      */
     public void removeGame() {
-        DiscordAPI.shard.online();
+        DiscordAPI.getShard().changePlayingText(null);
+    }
+
+    /*
+     * Method that gets all server members
+     */
+    public List<IUser> getUsers() {
+        return DiscordAPI.getClient().getUsers();
     }
 
     /*
@@ -451,36 +652,36 @@ public class DiscordUtil {
      * @param  {String} color
      * @return {Color}
      */
-    public Color getColor(String color) {
+    public Color getColor(String color) throws IllegalArgumentException {
         Matcher match = Pattern.compile("(\\d{1,3}),?\\s?(\\d{1,3}),?\\s?(\\d{1,3})").matcher(color);
 
         if (match.find()) {
             return new Color(Integer.parseInt(match.group(1)), Integer.parseInt(match.group(2)), Integer.parseInt(match.group(3)));
         } else {
             switch (color) {
-                case "black": 
+                case "black":
                     return Color.black;
-                case "blue": 
+                case "blue":
                     return Color.blue;
-                case "cyan": 
+                case "cyan":
                     return Color.cyan;
-                case "gray": 
+                case "gray":
                     return Color.gray;
-                case "green": 
+                case "green":
                     return Color.green;
-                case "magenta": 
+                case "magenta":
                     return Color.magenta;
-                case "orange": 
+                case "orange":
                     return Color.orange;
-                case "pink": 
+                case "pink":
                     return Color.pink;
-                case "red": 
+                case "red":
                     return Color.red;
-                case "white": 
+                case "white":
                     return Color.white;
-                case "yellow": 
+                case "yellow":
                     return Color.yellow;
-                default: 
+                default:
                     return Color.gray;
             }
         }

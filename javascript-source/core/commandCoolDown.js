@@ -9,8 +9,8 @@
 (function() {
     var defaultCooldownTime = $.getSetIniDbNumber('cooldownSettings', 'defaultCooldownTime', 5),
         modCooldown = $.getSetIniDbBoolean('cooldownSettings', 'modCooldown', false),
-        defaultCooldowns = [],
-        cooldowns = [];
+        defaultCooldowns = {},
+        cooldowns = {};
 
     $.raffleCommand = null;
 
@@ -129,7 +129,7 @@
             } else {
                 if (cooldown.cooldowns[username] !== undefined && cooldown.cooldowns[username] > $.systemTime()) {
                     return (cooldown.cooldowns[username] - $.systemTime() > 1000 ? Math.floor(((cooldown.cooldowns[username] - $.systemTime()) / 1000)) : 1);
-                } 
+                }
             }
         } else {
             if (defaultCooldowns[command] !== undefined && defaultCooldowns[command] > $.systemTime()) {
@@ -179,11 +179,19 @@
     function add(command, seconds, isGlobal) {
         if (cooldowns[command] === undefined) {
             cooldowns[command] = new Cooldown(command, seconds, isGlobal);
-            $.inidb.set('cooldown', command, JSON.stringify({command: String(command), seconds: String(seconds), isGlobal: String(isGlobal)}));
+            $.inidb.set('cooldown', command, JSON.stringify({
+                command: String(command),
+                seconds: String(seconds),
+                isGlobal: String(isGlobal)
+            }));
         } else {
             cooldowns[command].isGlobal = isGlobal;
             cooldowns[command].seconds = seconds;
-            $.inidb.set('cooldown', command, JSON.stringify({command: String(command), seconds: String(seconds), isGlobal: String(isGlobal)}));
+            $.inidb.set('cooldown', command, JSON.stringify({
+                command: String(command),
+                seconds: String(seconds),
+                isGlobal: String(isGlobal)
+            }));
         }
     }
 
@@ -237,7 +245,7 @@
             subAction = parseInt(subAction);
 
             if (subAction > -1) {
-                $.say($.whisperPrefix(sender) + $.lang.get('cooldown.coolcom.set', action, subAction)); 
+                $.say($.whisperPrefix(sender) + $.lang.get('cooldown.coolcom.set', action, subAction));
                 add(action, subAction, actionArgs);
             } else {
                 $.say($.whisperPrefix(sender) + $.lang.get('cooldown.coolcom.remove', action));
@@ -270,6 +278,9 @@
                 if (isNaN(parseInt(subAction))) {
                     $.say($.whisperPrefix(sender) + $.lang.get('cooldown.default.usage'));
                     return;
+                } else if (parseInt(subAction) < 5) {
+                    $.say($.whisperPrefix(sender) + $.lang.get('cooldown.coolcom.err'));
+                    return;
                 }
 
                 defaultCooldownTime = parseInt(subAction);
@@ -298,6 +309,9 @@
         if (event.getScript().equalsIgnoreCase('./core/commandCoolDown.js')) {
             if (event.getArgs()[0] == 'add') {
                 add(event.getArgs()[1], event.getArgs()[2], event.getArgs()[3].equals('true'));
+            } else if (event.getArgs()[0] == 'update') {
+                defaultCooldownTime = $.getIniDbNumber('cooldownSettings', 'defaultCooldownTime', 5);
+                modCooldown = $.getIniDbBoolean('cooldownSettings', 'modCooldown', false);
             } else {
                 remove(event.getArgs()[1]);
             }

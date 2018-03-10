@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
 package tv.phantombot.event.tipeeestream.donate;
 
 import tv.phantombot.event.tipeeestream.TipeeeStreamEvent;
-import tv.phantombot.twitchwsirc.Channel;
 
 public class TipeeeStreamDonationInitializedEvent extends TipeeeStreamEvent {
 
+    /*
+     * Class constructor.
+     */
     public TipeeeStreamDonationInitializedEvent() {
-    }
 
-    public TipeeeStreamDonationInitializedEvent(Channel channel) {
-        super(channel);
     }
 }

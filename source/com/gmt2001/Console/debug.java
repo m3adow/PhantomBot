@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,13 +22,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import tv.phantombot.PhantomBot;
 
-public class debug {
-
-    private static final debug instance = new debug();
-
-    public static debug instance() {
-        return instance;
-    }
+public final class debug {
 
     private debug() {
     }

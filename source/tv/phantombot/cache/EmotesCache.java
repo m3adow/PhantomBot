@@ -1,7 +1,7 @@
 /* astyle --style=java --indent=spaces=4 --mode=java */
 
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ public class EmotesCache implements Runnable {
             }
 
             try {
-                Thread.sleep(loopSleep * 1000); 
+                Thread.sleep(loopSleep * 1000);
             } catch (InterruptedException ex) {
                 com.gmt2001.Console.debug.println("EmotesCache.run: Failed to execute initial sleep: [InterruptedException] " + ex.getMessage());
             }
@@ -119,8 +119,8 @@ public class EmotesCache implements Runnable {
             if (jsonResult.getInt("_http") == 200) {
                 return true;
             } else if (jsonResult.getInt("_http") == 404 && ignore404) {
-                return true; 
-            } else if (jsonResult.getInt("_http") != 404 || (jsonResult.getInt("_http") == 404 && !ignore404)) { 
+                return true;
+            } else if (jsonResult.getInt("_http") != 404 || (jsonResult.getInt("_http") == 404 && !ignore404)) {
                 try {
                     throw new Exception("[HTTPErrorExecption] HTTP " + " " + jsonResult.getInt("_http") + ". req=" +
                                         jsonResult.getString("_type") + " " + jsonResult.getString("_url") + "   " +
@@ -202,7 +202,7 @@ public class EmotesCache implements Runnable {
         }
 
         com.gmt2001.Console.debug.println("Pushing Emote JSON Objects to EventBus");
-        EventBus.instance().post(new EmotesGetEvent(twitchJsonResult, bttvJsonResult, bttvLocalJsonResult, ffzJsonResult, ffzLocalJsonResult, PhantomBot.getChannel(this.channel)));
+        EventBus.instance().post(new EmotesGetEvent(twitchJsonResult, bttvJsonResult, bttvLocalJsonResult, ffzJsonResult, ffzLocalJsonResult));
         System.gc();
 
         /* Set these to null to save memory */

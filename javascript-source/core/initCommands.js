@@ -1,5 +1,5 @@
 (function() {
-    var bot = $.botName;
+    var bot = $.botName.toLowerCase();
 
     /*
      * @event command
@@ -24,8 +24,8 @@
             if (action.equalsIgnoreCase('disconnect')) {
                 $.say($.whisperPrefix(sender) + $.lang.get('init.disconnect', 'irc-ws.chat.twitch.tv'));
 
-                setTimeout(function() { 
-                    java.lang.System.exit(0); 
+                setTimeout(function() {
+                    java.lang.System.exit(0);
                 }, 1000);
             }
 
@@ -33,19 +33,19 @@
              * @commandpath botName moderate - Forces the bot to detect its moderator status.
              */
             if (action.equalsIgnoreCase('moderate')) {
-                $.session.saySilent('.mods');
+                $.session.getModerationStatus();
             }
 
             /*
              * @commandpath botName setconnectmessage [message] - Sets a message that will be said once the bot joins the channel.
              */
             if (action.equalsIgnoreCase('setconnectmessage')) {
-                if (action === undefined) {
+                if (subAction === undefined) {
                     $.say($.whisperPrefix(sender) + $.lang.get('init.connected.msg.usage', bot));
                     return;
                 }
 
-                var message = args.slice(0).join(' ');
+                var message = args.slice(1).join(' ');
 
                 $.setIniDbString('settings', 'connectedMsg', message);
                 $.say($.whisperPrefix(sender) + $.lang.get('init.connected.msg', message));
@@ -58,7 +58,7 @@
                 $.inidb.del('settings', 'connectedMsg');
                 $.say($.whisperPrefix(sender) + $.lang.get('init.connected.msg.removed'));
             }
-            
+
             /*
              * @commandpath botName togglepricecommods - Toggles if moderators and higher pay for commands.
              */
@@ -197,7 +197,7 @@
 
                         $.say($.whisperPrefix(sender) + $.lang.get('init.module.enabled', module.getModuleName()));
                     } catch (ex) {
-                        $.log.error('Unable to call initReady for enabled module (' + module.scriptName +'): ' + ex);
+                        $.log.error('Unable to call initReady for enabled module (' + module.scriptName + '): ' + ex);
                     }
                 } else {
                     $.say($.whisperPrefix(sender) + $.lang.get('init.module.404'));
@@ -262,13 +262,13 @@
                     $.bot.modules[module.scriptName].isEnabled = true;
 
                     var hookIndex = $.bot.getHookIndex(module.scriptName, 'initReady');
-                    
+
                     try {
                         if (hookIndex !== -1) {
                             $.bot.getHook(module.scriptName, 'initReady').handler();
                         }
                     } catch (ex) {
-                        $.log.error('Unable to call initReady for enabled module (' + module.scriptName +'): ' + ex);
+                        $.log.error('Unable to call initReady for enabled module (' + module.scriptName + '): ' + ex);
                     }
                 }
             }
@@ -302,7 +302,7 @@
                             $.setIniDbBoolean('modules', module.scriptName, false);
                         }
                     }
-                } 
+                }
             }
         }
 
@@ -311,7 +311,7 @@
          */
         if (command.equalsIgnoreCase('reconnect')) {
             if ($.isBot(sender)) {
-                $.session.close();
+                $.session.getSocket().close();
             }
         }
 
@@ -343,9 +343,14 @@
         $.registerChatCommand('./core/initCommands.js', 'echo', 1);
         $.registerChatCommand('./core/initCommands.js', 'reconnect', 1);
         $.registerChatCommand('./core/initCommands.js', 'disconnect', 1);
-        $.registerChatCommand('./core/initCommands.js', $.botName, 2);
-        $.registerChatSubcommand($.botName, 'disconnect', 1);
-        $.registerChatSubcommand($.botName, 'reconnect', 1);
-        $.registerChatSubcommand($.botName, 'moderate', 2);
+        $.registerChatCommand('./core/initCommands.js', bot, 2);
+        $.registerChatSubcommand(bot, 'disconnect', 1);
+        $.registerChatSubcommand(bot, 'reconnect', 1);
+        $.registerChatSubcommand(bot, 'moderate', 2);
+
+        // Say the connected message.
+        if ($.inidb.exists('settings', 'connectedMsg')) {
+            $.say($.inidb.get('settings', 'connectedMsg'));
+        }
     });
 })();

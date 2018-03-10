@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,30 +16,37 @@
  */
 package tv.phantombot.event.gamewisp;
 
-import tv.phantombot.twitchwsirc.Channel;
-
 public class GameWispChangeEvent extends GameWispEvent {
-
     private final String username;
     private final String status;
 
+    /*
+     * Class constructor
+     *
+     * @param {String} username
+     * @param {String} status
+     */
     public GameWispChangeEvent(String username, String status) {
         this.username = username;
         this.status = status;
     }
 
-    public GameWispChangeEvent(String username, String status, Channel channel) {
-        super(channel);
-        this.username = username;
-        this.status = status;
-    }
-
+    /*
+     * Method that returns the subscriber's name.
+     *
+     * @return {String} username
+     */
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
+    /*
+     * Method that returns the subscriber's status.
+     *
+     * @return {String} status
+     */
     public String getStatus() {
-        return status;
+        return this.status;
     }
 }
 

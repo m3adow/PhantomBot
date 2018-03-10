@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public class HTTPServer {
     private String     serverWebAuth;
     private int        serverPort;
 
-    public HTTPServer(int myPort, String myPassword, String myWebAuth, final String panelUser, final String panelPassword) throws Exception {
+    public HTTPServer(String ip, int myPort, String myPassword, String myWebAuth, final String panelUser, final String panelPassword) throws Exception {
         serverPort = myPort;
         serverPassword = myPassword.replace("oauth:", "");
         serverWebAuth = myWebAuth;
@@ -57,7 +57,7 @@ public class HTTPServer {
         Thread.setDefaultUncaughtExceptionHandler(com.gmt2001.UncaughtExceptionHandler.instance());
 
         try {
-            server = HttpServer.create(new InetSocketAddress(serverPort), 0);
+            server = HttpServer.create((!ip.isEmpty() ? new InetSocketAddress(ip, serverPort) : new InetSocketAddress(serverPort)), 0);
             server.createContext("/", new HTTPServerHandler());
 
             HttpContext panelContext = server.createContext("/panel", new PanelHandler());
@@ -72,20 +72,26 @@ public class HTTPServer {
             ytContext.setAuthenticator(auth);
             panelContext.setAuthenticator(auth);
 
+            // For scania.
+            if (PhantomBot.betap) {
+                HttpContext betaPanelContext = server.createContext("/beta-panel", new BetaPanelHandler());
+                betaPanelContext.setAuthenticator(auth);
+            }
+
             server.start();
         } catch (BindException ex) {
-            com.gmt2001.Console.err.println("Failed to bind to port for HTTPS Server on port " + myPort);
+            com.gmt2001.Console.err.println("Failed to bind to port for HTTP Server on port " + myPort);
             com.gmt2001.Console.warn.println("Please make sure nothing is currently using port " + myPort + " on your system");
             com.gmt2001.Console.warn.println("You can also change the baseport in the botlogin.txt file to a different value, such as " + (myPort + 1000));
-            throw new Exception("Failed to Create HTTPSServer on Port " + myPort);
+            throw new Exception("Failed to Create HTTPServer on Port " + myPort);
         } catch (IOException ex) {
-            com.gmt2001.Console.err.println("Failed to create HTTPS Server: " + ex.getMessage());
+            com.gmt2001.Console.err.println("Failed to create HTTP Server: " + ex.getMessage());
             com.gmt2001.Console.err.logStackTrace(ex);
-            throw new Exception("Failed to Create HTTPSServer on Port " + myPort);
+            throw new Exception("Failed to Create HTTPServer on Port " + myPort);
         } catch (Exception ex) {
-            com.gmt2001.Console.err.println("Failed to create HTTPS Server: " + ex.getMessage());
+            com.gmt2001.Console.err.println("Failed to create HTTP Server: " + ex.getMessage());
             com.gmt2001.Console.err.logStackTrace(ex);
-            throw new Exception("Failed to Create HTTPSServer on Port " + myPort);
+            throw new Exception("Failed to Create HTTPServer on Port " + myPort);
         }
     }
 
@@ -104,6 +110,12 @@ public class HTTPServer {
     class PanelHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
             HTTPServerCommon.handlePanel(exchange);
+        }
+    }
+
+    class BetaPanelHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            HTTPServerCommon.handleBetaPanel(exchange);
         }
     }
 

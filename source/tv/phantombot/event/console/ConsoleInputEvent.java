@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,33 @@
 package tv.phantombot.event.console;
 
 public class ConsoleInputEvent extends ConsoleEvent {
+    private final String message;
 
-    String msg;
-
-    public ConsoleInputEvent(String msg) {
-        this.msg = msg;
+    /*
+     * Class constructor for this event.
+     *
+     * @param {String} message
+     */
+    public ConsoleInputEvent(String message) {
+        this.message = message;
     }
 
-    public String getMsg() {
-        return msg;
+    /*
+     * Method that will return the message said in the console.
+     *
+     * @return {String} message
+     */
+    public String getMessage() {
+        return this.message;
+    }
+
+    /*
+     * Method that returns this object as a string.
+     *
+     * @return {String}
+     */
+    @Override
+    public String toString() {
+        return "ConsoleInputEvent -> { message: [" + this.message + "] }";
     }
 }

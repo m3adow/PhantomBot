@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 package tv.phantombot.event.irc.message;
 
 import java.util.Map;
-import tv.phantombot.twitchwsirc.Channel;
-import tv.phantombot.twitchwsirc.Session;
+
+import tv.phantombot.twitchwsirc.chat.Session;
 
 /**
  *
@@ -26,15 +26,26 @@ import tv.phantombot.twitchwsirc.Session;
  */
 public class IrcPrivateMessageEvent extends IrcMessageEvent {
 
+    /*
+     * Class constructor.
+     *
+     * @param {Session} session
+     * @param {String}  sender
+     * @param {String}  message
+     */
     public IrcPrivateMessageEvent(Session session, String sender, String message) {
-        super(session, sender, message, null, null);
+        super(session, sender, message);
     }
 
+    /*
+     * Class constructor.
+     *
+     * @param {Session} session
+     * @param {String}  sender
+     * @param {String}  message
+     * @param {Map}     tags
+     */
     public IrcPrivateMessageEvent(Session session, String sender, String message, Map<String, String> tags) {
-        super(session, sender, message, tags, null);
-    }
-
-    public IrcPrivateMessageEvent(Session session, String sender, String message, Map<String, String> tags, Channel channel) {
-        super(session, sender, message, tags, channel);
+        super(session, sender, message, tags);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,9 +87,9 @@
                     '    <td style="width: 15%">Notice #' + id + '</td>' +
                     '    <td style="vertical-align: middle">' +
                     '        <form onkeypress="return event.keyCode != 13">' +
-                    '            <input style="width: 80%" type="text" id="inlineNoticeEdit_' + id + '"' +
+                    '            <input style="width: 80%" type="text" class="input-control" id="inlineNoticeEdit_' + id + '"' +
                     '                   value="' + msgObject['results'][idx]['value'] + '" />' +
-                    '              <button type="button" class="btn btn-default btn-xs" onclick="$.updateNotice(\'' + id + '\')"><i class="fa fa-pencil" /> </button> ' +
+                    '              <button type="button" class="btn btn-default btn-xs" onclick="$.updateNotice(\'' + id + '\')"><i class="fa fa-hdd-o" /> </button> ' +
                     '              <button type="button" class="btn btn-default btn-xs" id="deleteNotice_' + id + '" onclick="$.deleteNotice(\'' + id + '\')"><i class="fa fa-trash" /> </button>' +
                     '             </form>' +
                     '        </form>' +

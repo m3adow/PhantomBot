@@ -6,7 +6,7 @@
         reg = new RegExp(/^@\w+,\s?$/),
         timeout = 0;
 
-    /* 
+    /*
      * @function reloadMisc
      */
     function reloadMisc() {
@@ -15,7 +15,7 @@
     }
 
     /**
-    ** This function sometimes does not work. So only use it for stuff that people dont use much
+     ** This function sometimes does not work. So only use it for stuff that people dont use much
      * @function hasKey
      * @export $.list
      * @param {Array} list
@@ -49,13 +49,6 @@
         return parseInt($.session.getWrites());
     }
 
-    /*
-     * @function getMessageWrites
-     */
-    function getMessageQueue() {
-        return parseInt($.session.getQueue());
-    }
-
     /**
      * @function isKnown
      * @export $.user
@@ -63,7 +56,17 @@
      * @returns {boolean}
      */
     function isKnown(username) {
-        return $.inidb.exists('visited', username.replace('@', '').toLowerCase());
+        return $.inidb.exists('visited', username.toLowerCase());
+    }
+
+    /**
+     * @function sanitize
+     * @export $.user
+     * @param {string} username
+     * @returns {string}
+     */
+    function sanitize(username) {
+        return (username == null ? username : String(username).replace(/\W/g, '').toLowerCase());
     }
 
     /**
@@ -172,17 +175,6 @@
     }
 
     /**
-     * @function timeoutUserReason
-     * @export $
-     * @param {string} username
-     * @param {string} time
-     * @param {string} reason
-     */
-    function timeoutUserReason(username, time, reason) {
-        $.session.say('.timeout ' + username + ' ' + time + ' ' + reason);
-    }
-
-    /**
      * @function systemTime
      * @export $
      * @returns {Number}
@@ -247,7 +239,7 @@
      */
     function arrayShuffle(array) {
         for (var i = array.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * ( i + 1 ));
+            var j = Math.floor(Math.random() * (i + 1));
             var temp = array[i];
             array[i] = array[j];
             array[j] = temp;
@@ -573,13 +565,13 @@
      * @param {String}  Value of sender for $.whisperPrefix
      * @param {Number}  Page to display, 0 for ALL
      * @return {Number} Total number of pages.
-     * 
+     *
      */
     function paginateArray(array, langKey, sep, whisper, sender, display_page) {
         var idx,
             output = '',
             maxlen,
-            hasNoLang = langKey.startsWith('NULL')
+            hasNoLang = langKey.startsWith('NULL'),
             pageCount = 0;
 
         if (display_page === undefined) {
@@ -594,7 +586,7 @@
                 pageCount++;
                 if (display_page === 0 || display_page === pageCount) {
                     if (whisper) {
-                        $.say($.whisperPrefix(sender) + (hasNoLang ? (langKey + output)  : $.lang.get(langKey, output)));
+                        $.say($.whisperPrefix(sender) + (hasNoLang ? (langKey + output) : $.lang.get(langKey, output)));
                     } else {
                         $.say((hasNoLang ? (langKey + output) : $.lang.get(langKey, output)));
                     }
@@ -609,10 +601,55 @@
         pageCount++;
         if (display_page === 0 || display_page === pageCount) {
             if (whisper) {
-                $.say($.whisperPrefix(sender) + (hasNoLang ? (langKey + output)  : $.lang.get(langKey, output)));
+                $.say($.whisperPrefix(sender) + (hasNoLang ? (langKey + output) : $.lang.get(langKey, output)));
             } else {
-                $.say((hasNoLang ? (langKey + output)  : $.lang.get(langKey, output)));
+                $.say((hasNoLang ? (langKey + output) : $.lang.get(langKey, output)));
             }
+        }
+        return pageCount;
+    }
+
+    /**
+     * @function paginateArrayDiscord
+     * @export $
+     * @param {Array}   Input array of data to paginate
+     * @param {String}  Key in the $.lang system
+     * @param {String}  Seperator to use between items
+     * @param {String}  Value of sender for $.whisperPrefix
+     * @param {Number}  Page to display, 0 for ALL
+     * @return {Number} Total number of pages.
+     *
+     */
+    function paginateArrayDiscord(array, langKey, sep, channel, sender, display_page) {
+        var idx,
+            output = '',
+            maxlen,
+            hasNoLang = langKey.startsWith('NULL'),
+            pageCount = 0;
+
+        if (display_page === undefined) {
+            display_page = 0;
+        }
+
+        maxlen = 1400 - (hasNoLang ? langKey.length : $.lang.get(langKey).length);
+        langKey = langKey.replace('NULL', '');
+        for (idx in array) {
+            output += array[idx];
+            if (output.length >= maxlen) {
+                pageCount++;
+                if (display_page === 0 || display_page === pageCount) {
+                    $.discord.say(channel, $.discord.userPrefix(sender) + ' ' + (hasNoLang ? (langKey + output) : $.lang.get(langKey, output)));
+                }
+                output = '';
+            } else {
+                if (idx < array.length - 1) {
+                    output += sep;
+                }
+            }
+        }
+        pageCount++;
+        if (display_page === 0 || display_page === pageCount) {
+            $.discord.say(channel, $.discord.userPrefix(sender) + ' ' + (hasNoLang ? (langKey + output) : $.lang.get(langKey, output)));
         }
         return pageCount;
     }
@@ -626,11 +663,11 @@
         if (find.equals(replace)) {
             return string;
         }
-    
+
         while (string.indexOf(find) >= 0) {
-            string = string.replace(find, replace);
+            string = string.replace(find, (replace + ''));
         }
-    
+
         return string;
     }
 
@@ -642,17 +679,17 @@
     function userPrefix(username, comma) {
         if (!comma) {
             return '@' + $.username.resolve(username) + ' ';
-        } 
+        }
         return '@' + $.username.resolve(username) + ', ';
     }
 
     /** Export functions to API */
     $.user = {
         isKnown: isKnown,
-        isFollower: isFollower
+        isFollower: isFollower,
+        sanitize: sanitize
     };
 
-    $.timeoutUserReason = timeoutUserReason;
     $.arrayShuffle = arrayShuffle;
     $.getCurrentHostTarget = getCurrentHostTarget;
     $.getIniDbBoolean = getIniDbBoolean;
@@ -687,6 +724,6 @@
     $.hasKey = hasKey;
     $.systemTimeNano = systemTimeNano;
     $.getMessageWrites = getMessageWrites;
-    $.getMessageQueue = getMessageQueue;
     $.sayWithTimeout = sayWithTimeout;
+    $.paginateArrayDiscord = paginateArrayDiscord;
 })();

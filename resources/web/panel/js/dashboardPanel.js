@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -214,6 +214,15 @@
                 }
             }
 
+            if (panelCheckQuery(msgObject, 'dashboard_gameCommunity')) {
+                if (msgObject['results']['communities'] !== undefined) {
+                    var arr = msgObject['results']['communities'].split(', ');
+                    for (var i = 0; i < 3; i++) {
+                        $('#stream-community-' + (i + 1)).val((arr[i] === undefined ? '' : arr[i]));
+                    }
+                }
+            }
+
             if (panelCheckQuery(msgObject, 'dashboard_streamlastfollow')) {
                 if (msgObject['results']['lastFollow'] == null) {
                     $("#lastFollow").html("");
@@ -320,6 +329,7 @@
         sendDBQuery("dashboard_streamlastsub", "streamInfo", "lastSub");
         sendDBQuery("dashboard_streamlastdonator", "streamInfo", "lastDonator");
         sendDBQuery("dashboard_gameTitle", "streamInfo", "game");
+        sendDBQuery("dashboard_gameCommunity", "streamInfo", "communities");
         sendDBQuery("dashboard_loggingModeEvent", "settings", "log.event");
         sendDBQuery("dashboard_loggingModeFile", "settings", "log.file");
         sendDBQuery("dashboard_loggingModeErr", "settings", "log.error");
@@ -465,6 +475,27 @@
     }
 
     /**
+     * @function setCommunity
+     */
+    function setCommunity() {
+        var c = [];
+
+        if ($('#stream-community-1').val().length > 0) {
+            c.push($('#stream-community-1').val());
+        }
+
+        if ($('#stream-community-2').val().length > 0) {
+            c.push($('#stream-community-2').val());
+        }
+
+        if ($('#stream-community-3').val().length > 0) {
+            c.push($('#stream-community-3').val());
+        }
+
+        sendCommand('setcommunitysilent ' + c.join(', '));
+    }
+
+    /**
      * @function chatReconnect
      */
     function chatReconnect() {
@@ -586,8 +617,16 @@
     function toggleTwitchChat() {
         if ($("#chatsidebar").is(":visible")) {
             $("#chatsidebar").fadeOut(1000);
+            localStorage.setItem('phantombot_chattoggle', 'false');
         } else {
             $("#chatsidebar").fadeIn(1000);
+            // Load the iframe if it isn't there.
+            if ($("#chatsidebar").html().indexOf(getChannelName().toLowerCase()) === -1) {
+                $("#chatsidebar").append("<iframe id=\"chat\" frameborder=\"0\" scrolling=\"no\" onload=\"hideLoadingImage()\"" +
+                                             "src=\"https://www.twitch.tv/" + getChannelName().toLowerCase() + "/chat?popout=\">");
+                $("#chatsidebar").draggable({ iframeFix: true });
+            }
+            localStorage.setItem('phantombot_chattoggle', 'true');
         }
     }
 
@@ -672,4 +711,5 @@
     $.queueCMD = queueCMD;
     $.queueCMDNext = queueCMDNext;
     $.setLogRotate = setLogRotate;
+    $.setCommunity = setCommunity;
 })();

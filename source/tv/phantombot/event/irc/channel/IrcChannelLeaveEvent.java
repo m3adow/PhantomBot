@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,25 +16,40 @@
  */
 package tv.phantombot.event.irc.channel;
 
-import tv.phantombot.twitchwsirc.Channel;
-import tv.phantombot.twitchwsirc.Session;
+import tv.phantombot.twitchwsirc.chat.Session;
 
 public class IrcChannelLeaveEvent extends IrcChannelEvent {
-
     private final String user;
-    private final String message;
 
-    public IrcChannelLeaveEvent(Session session, Channel channel, String user, String message) {
-        super(session, channel);
+    /*
+     * Class constructor
+     *
+     * @param {Session} session
+     * @param {String} user
+     */
+    public IrcChannelLeaveEvent(Session session, String user) {
+        super(session);
+
         this.user = user;
-        this.message = message;
     }
 
+    /*
+     * Class constructor
+     *
+     * @param {String} user
+     */
+    public IrcChannelLeaveEvent(String user) {
+        super(null);
+
+        this.user = user;
+    }
+
+    /*
+     * Method that returns the user who left.
+     *
+     * @return {String} user
+     */
     public String getUser() {
-        return user;
-    }
-
-    public String getMessage() {
-        return message;
+        return this.user;
     }
 }

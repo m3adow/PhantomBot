@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,31 +17,25 @@
 package tv.phantombot.event.twitter;
 
 import tv.phantombot.event.Event;
-import tv.phantombot.twitchwsirc.Channel;
 
 public class TwitterRetweetEvent extends Event {
-
-    /* This class uses an array of String objects for the usernames to reduce
-     * the number of calls to the bus.
-     */
     private final String[] userNameArray;
-    private final Channel channel;
 
+    /*
+     * Class constructor.
+     *
+     * @param {String[]} userNameArray
+     */
     public TwitterRetweetEvent(String[] userNameArray) {
         this.userNameArray = userNameArray;
-        this.channel = null;
     }
 
-    public TwitterRetweetEvent(String[] userNameArray, Channel channel) {
-        this.userNameArray = userNameArray;
-        this.channel = channel;
-    }
-
+    /*
+     * Method that returns the array of users.
+     *
+     * @return {String[]} userNameArray
+     */
     public String[] getUserNameArray() {
-        return userNameArray;
-    }
-
-    public Channel getChannel() {
-        return channel;
+        return this.userNameArray;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ public class TipeeeStreamCache implements Runnable {
 
     /*
      * Checks the amount of time we failed when calling the api to avoid abusing it.
-     */ 
+     */
     private void checkLastFail() {
         Calendar cal = Calendar.getInstance();
         numfail = (lastFail.after(new Date()) ? numfail + 1 : 1);
@@ -164,11 +164,11 @@ public class TipeeeStreamCache implements Runnable {
                     }
                 }
             } else {
-                try { 
+                try {
                     throw new Exception("[HTTPErrorExecption] HTTP " + " " + jsonResult.getInt("_http") + ". req=" +
-                        jsonResult.getString("_type") + " " + jsonResult.getString("_url") + "   " +
-                        (jsonResult.has("message") && !jsonResult.isNull("message") ? "message=" +
-                        jsonResult.getString("message") : "content=" + jsonResult.getString("_content")));
+                                        jsonResult.getString("_type") + " " + jsonResult.getString("_url") + "   " +
+                                        (jsonResult.has("message") && !jsonResult.isNull("message") ? "message=" +
+                                         jsonResult.getString("message") : "content=" + jsonResult.getString("_content")));
                 } catch (Exception ex) {
                     /* Kill this cache if the tipeeestream token is bad and disable the module. */
                     if (ex.getMessage().contains("authentification")) {
@@ -193,13 +193,13 @@ public class TipeeeStreamCache implements Runnable {
 
         if (firstUpdate && !killed) {
             firstUpdate = false;
-            EventBus.instance().post(new TipeeeStreamDonationInitializedEvent(PhantomBot.getChannel(this.channel)));
+            EventBus.instance().post(new TipeeeStreamDonationInitializedEvent());
         }
 
         if (donations != null && !killed) {
             for (int i = 0; i < donations.length(); i++) {
                 if (cache == null || !cache.containsKey(donations.getJSONObject(i).get("id").toString())) {
-                    EventBus.instance().post(new TipeeeStreamDonationEvent(donations.getJSONObject(i).toString(), PhantomBot.getChannel(this.channel)));
+                    EventBus.instance().post(new TipeeeStreamDonationEvent(donations.getJSONObject(i).toString()));
                 }
             }
         }

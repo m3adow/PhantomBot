@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
 package tv.phantombot.event.twitch.host;
 
 import tv.phantombot.event.twitch.TwitchEvent;
-import tv.phantombot.twitchwsirc.Channel;
 
 public class TwitchHostsInitializedEvent extends TwitchEvent {
 
+    /*
+     * Class constructor.
+     */
     public TwitchHostsInitializedEvent() {
-    }
 
-    public TwitchHostsInitializedEvent(Channel channel) {
-        super(channel);
     }
 }

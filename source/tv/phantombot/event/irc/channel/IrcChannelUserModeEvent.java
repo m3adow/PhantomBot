@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 phantombot.tv
+ * Copyright (C) 2016-2018 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,31 +16,53 @@
  */
 package tv.phantombot.event.irc.channel;
 
-import tv.phantombot.twitchwsirc.Channel;
-import tv.phantombot.twitchwsirc.Session;
+import tv.phantombot.twitchwsirc.chat.Session;
 
 public class IrcChannelUserModeEvent extends IrcChannelEvent {
-
     private final String user;
     private final String mode;
-    private final Boolean add;
+    private final boolean add;
 
-    public IrcChannelUserModeEvent(Session session, Channel channel, String user, String mode, Boolean add) {
-        super(session, channel);
+    /*
+     * Class constructor
+     *
+     * @param {Session} session
+     * @param {String}  user
+     * @param {String}  mode
+     * @param {boolean} add
+     */
+    public IrcChannelUserModeEvent(Session session, String user, String mode, boolean add) {
+        super(session);
+
         this.user = user;
         this.mode = mode;
         this.add = add;
     }
 
+    /*
+     * Method that returns the user whose mode changed
+     *
+     * @return {String} user
+     */
     public String getUser() {
-        return user;
+        return this.user;
     }
 
+    /*
+     * Method that returns the user's mode.
+     *
+     * @return {String} mode
+     */
     public String getMode() {
-        return mode;
+        return this.mode;
     }
 
-    public Boolean getAdd() {
-        return add;
+    /*
+     * Method that returns if the user got OP or not.
+     *
+     * @return {boolean} add
+     */
+    public boolean getAdd() {
+        return this.add;
     }
 }

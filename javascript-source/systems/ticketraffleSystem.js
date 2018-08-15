@@ -50,7 +50,7 @@
         }
 
         if (isNaN(parseInt(max)) || isNaN(parseInt(price))) {
-            $.say($.whisperPrefix(sender) + $.lang.get('ticketrafflesystem.usage'));
+            $.say($.whisperPrefix(user) + $.lang.get('ticketrafflesystem.usage'));
             return;
         }
 

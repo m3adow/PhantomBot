@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package tv.phantombot.wschat.twitch.chat.utils;
+package tv.phantombot.twitch.irc.chat.utils;
 
 import java.util.HashMap;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import tv.phantombot.wschat.twitch.TwitchSession;
+import tv.phantombot.twitch.irc.TwitchSession;
 import tv.phantombot.PhantomBot;
 
 public class MessageQueue implements Runnable {

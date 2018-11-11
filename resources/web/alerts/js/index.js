@@ -109,6 +109,26 @@ $(function() {
     }
 
     /*
+     * @function Handles the user interaction for the page.
+     */
+    function handleBrowserInteraction() {
+        const audio = new Audio();
+
+        // Try to play to see if we can interact.
+        audio.play().catch(function(err) {
+            // User need to interact with the page.
+            if (err.toString().startsWith('NotAllowedError')) {
+                $('.main-alert').append($('<button/>', {
+                    'html': 'Click me to activate audio hooks.',
+                    'style': 'top: 50%; position: absolute; font-size: 30px; font-weight: 30; cursor: pointer;'
+                }).on('click', function() {
+                    $(this).remove();
+                }));
+            }
+        });
+    }
+
+    /*
      * @function Handles the queue.
      */
     function handleQueue() {
@@ -187,7 +207,9 @@ $(function() {
                 isPlaying = false;
             });
             // Play the audio.
-            audio.play();
+            audio.play().catch(function(err) {
+                console.log(err);
+            });;
         } else {
             isPlaying = false;
         }
@@ -239,10 +261,11 @@ $(function() {
             if (gifFile.match(/\.(webm|mp4|ogg)$/) !== null) {
                 htmlObj = $('<video/>', {
                     'src': defaultPath + gifFile,
-                    'volume': gifVolume,
                     'autoplay': 'autoplay',
                     'style': gifCss
                 });
+
+                htmlObj.prop('volume', gifVolume);
             } else {
                 htmlObj = $('<img/>', {
                     'src': defaultPath + gifFile,
@@ -257,7 +280,9 @@ $(function() {
                 // Set the volume.
                 audio.volume = gifVolume;
                 // Play the sound.
-                audio.play();
+                audio.play().catch(function() {
+                    // Ignore.
+                });
             }).delay(gifDuration) // Wait this time before removing this image.
               .fadeOut(1e2, function() { // Remove the image with a fade out.
                 let t = $(this);
@@ -318,6 +343,8 @@ $(function() {
                 if (message.authresult !== undefined) {
                     if (message.authresult === 'true') {
                         printDebug('Successfully authenticated with the socket.', true);
+                        // Handle this.
+                        handleBrowserInteraction()
                     } else {
                         printDebug('Failed to authenticate with the socket.', true);
                     }

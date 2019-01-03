@@ -79,7 +79,7 @@
      * @param {String} message
      */
     function consoleDebug(message) {
-        if (Packages.tv.phantombot.PhantomBot.getEnableDebugging()) {
+        if (Packages.tv.phantombot.PhantomBot.enableDebugging) {
             try {
                 throw new Error();
             } catch (ex) {
@@ -956,6 +956,13 @@
          */
         $api.on($script, 'webPanelSocketUpdate', function(event) {
             callHook('webPanelSocketUpdate', event, false);
+        });
+        
+        /*
+         * @event PubSubModerationDelete
+         */
+        $api.on($script, 'PubSubModerationDelete', function (event) {
+            callHook('PubSubModerationDelete', event, false);
         });
 
         /*

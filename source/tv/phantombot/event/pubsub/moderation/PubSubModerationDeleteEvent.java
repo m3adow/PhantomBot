@@ -14,23 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.gmt2001.Console;
+package tv.phantombot.event.pubsub.moderation;
 
-import java.text.SimpleDateFormat;
-
-import java.util.Date;
-import java.util.TimeZone;
-
-import tv.phantombot.PhantomBot;
-
-public final class logTimestamp {
-
-    private logTimestamp() {
-    }
-
-    public static String log() {
-        SimpleDateFormat datefmt = new SimpleDateFormat("MM-dd-yyyy @ HH:mm:ss.SSS z");
-        datefmt.setTimeZone(TimeZone.getTimeZone(PhantomBot.timeZone));
-        return datefmt.format(new Date());
+public class PubSubModerationDeleteEvent extends PubSubModerationEvent {
+    /*
+     * Class constructor.
+     *
+     * @param {String} username
+     * @param {String} creator
+     * @param {String} message
+     */
+    public PubSubModerationDeleteEvent(String username, String creator, String message) {
+        super(username, creator, message);
     }
 }

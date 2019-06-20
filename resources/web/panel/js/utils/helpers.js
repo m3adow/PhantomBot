@@ -154,7 +154,7 @@ $(function() {
             case 'bits':
                 return 'background-color: #6441a5;';
             case 'host':
-                return 'background-color: #ed1c2a;';
+                return 'background-color: #ed4c1c;';
             case 'auto-host':
                 return 'background-color: #ffff00; color: #000000;';
             case 'tip': // To be added soon.
@@ -827,9 +827,11 @@ $(function() {
         if (typeof id === 'object') {
             for (let i = 0; i < id.length; i++) {
                 if (toggle === 'false') {
-                    $('#' + id[i]).slideUp(helpers.DELAY_MS);
+                    //$('#' + id[i]).slideUp(helpers.DELAY_MS);
+                    $('#' + id[i] + ' *').prop('disabled', true);
                 } else {
-                    $('#' + id[i]).slideDown(helpers.DELAY_MS);
+                    //$('#' + id[i]).slideDown(helpers.DELAY_MS);
+                    $('#' + id[i] + ' *').prop('disabled', false);
                 }
             }
             // Handle the switch toggle
@@ -837,13 +839,25 @@ $(function() {
         } else {
             if (toggle === 'false') {
                 $('#' + id + 'Toggle').prop('checked', false);
-                $('#' + id).slideUp(helpers.DELAY_MS);
+                //$('#' + id).slideUp(helpers.DELAY_MS);
+                $('#' + id + ' *').prop('disabled', true);
             } else {
                 $('#' + id + 'Toggle').prop('checked', true);
-                $('#' + id).slideDown(helpers.DELAY_MS);
+                //$('#' + id).slideDown(helpers.DELAY_MS);
+                $('#' + id + ' *').prop('disabled', false);
             }
         }
         return toggle === 'true';
+    };
+
+    /*
+     * @function Same as the function above but doesn't return anything but true.
+     *
+     * @param  {String}|{Array} id
+     * @return {Boolean}
+     */
+    helpers.handleModuleLoadUp = function(id, toggle, swit) {
+        return helpers.getModuleStatus(id, toggle, swit);
     };
 
     /*

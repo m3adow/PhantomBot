@@ -892,6 +892,44 @@ public class MySQLStore extends DataStore {
             com.gmt2001.Console.err.printStackTrace(ex);
         }
     }
+    
+    @Override
+    public void IncreaseBatchString(String fName, String section, String[] keys, String value) {
+        fName = validateFname(fName);
+
+        AddFile(fName);
+
+        try {
+            Statement statement = connection.createStatement();
+            statement.addBatch("UPDATE phantombot_" + fName + " SET value = CAST(value AS INTEGER) + " + value + " WHERE section = '" + section + "' AND variable IN ('" + String.join("', '", keys) + "');");
+
+            String s = "INSERT IGNORE INTO phantombot_" + fName + " (section, variable, value) VALUES ";
+
+            boolean first = true;
+            for (String k : keys) {
+                if (!first) {
+                    s += ",";
+                }
+<<<<<<< HEAD
+                first = false;
+                s += "('', '" + k + "', " + value + ")";
+=======
+                
+                first = false;
+                s += "('" + section + "', '" + k + "', " + value + ")";
+>>>>>>> fab726ae312369cb3bc2d05c489e41faf6caff59
+            }
+
+            statement.addBatch(s + ";");
+            statement.executeBatch();
+        } catch (SQLException ex) {
+<<<<<<< HEAD
+=======
+            ex.printStackTrace();
+>>>>>>> fab726ae312369cb3bc2d05c489e41faf6caff59
+            com.gmt2001.Console.err.printStackTrace(ex);
+        }
+    }
 
     @Override
     public void CreateIndexes() {

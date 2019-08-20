@@ -940,7 +940,7 @@ public class SqliteStore extends DataStore {
                 insertMap.put(keys[idx], values[idx]);
             }
         }
-        
+
         setAutoCommit(false);
 
         try {
@@ -953,7 +953,7 @@ public class SqliteStore extends DataStore {
                         statement.setString(2, section);
                         statement.setString(3, key);
                         statement.addBatch();
-    
+
                         if (idx++ % 500 == 0) {
                             statement.executeBatch();
                             statement.clearBatch();
@@ -973,7 +973,7 @@ public class SqliteStore extends DataStore {
                         statement.setString(2, section);
                         statement.setString(3, key);
                         statement.addBatch();
-    
+
                         if (idx++ % 500 == 0) {
                             statement.executeBatch();
                             statement.clearBatch();
@@ -1019,6 +1019,39 @@ public class SqliteStore extends DataStore {
                     statement.executeUpdate();
                 }
             }
+        } catch (SQLException ex) {
+            com.gmt2001.Console.err.printStackTrace(ex);
+        }
+    }
+
+<<<<<<< HEAD
+    @Override
+=======
+   @Override
+>>>>>>> fab726ae312369cb3bc2d05c489e41faf6caff59
+    public void IncreaseBatchString(String fName, String section, String[] keys, String value) {
+        fName = validateFname(fName);
+
+        AddFile(fName);
+
+        try {
+            Statement statement = connection.createStatement();
+            statement.addBatch("UPDATE phantombot_" + fName + " SET value = CAST(value AS INTEGER) + " + value + " WHERE section = '" + section + "' AND variable IN ('" + String.join("', '", keys) + "');");
+
+            String s = "INSERT OR IGNORE INTO phantombot_" + fName + " (section, variable, value) VALUES ";
+
+            boolean first = true;
+            for (String k : keys) {
+                if (!first) {
+                    s += ",";
+                }
+                
+                first = false;
+                s += "('" + section + "', '" + k + "', " + value + ")";
+            }
+
+            statement.addBatch(s + ";");
+            statement.executeBatch();
         } catch (SQLException ex) {
             com.gmt2001.Console.err.printStackTrace(ex);
         }

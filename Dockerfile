@@ -48,7 +48,7 @@ ARG DATADIR=${BASEDIR}_data
 
 RUN mkdir -p "${BASEDIR}" "${DATADIR}" "${BASEDIR}/logs"
 
-COPY --from=builder "${BUILDDIR}/dist/${PROJECT_NAME}-3.0.0/." "${BASEDIR}/"
+COPY --from=builder "${BUILDDIR}/dist/${PROJECT_NAME}-3.1.0/." "${BASEDIR}/"
 
 RUN cd "${BASEDIR}" \
     && rm -rf \
@@ -68,8 +68,8 @@ RUN cd "${BASEDIR}" \
     && ln -s "${DATADIR}/dbbackup" \
     && ln -s "${DATADIR}/logs" \
     && ln -s "${DATADIR}/scripts/custom" "${BASEDIR}/scripts/custom" \
-    && ln -s "${DATADIR}/scripts/discord/custom" "${BASEDIR}/scripts/discord/" \
-    && ln -s "${DATADIR}/scripts/lang/custom" "${BASEDIR}/scripts/lang/"
+    && ln -s "${DATADIR}/scripts/discord" "${BASEDIR}/scripts/discord/custom" \
+    && ln -s "${DATADIR}/scripts/lang" "${BASEDIR}/scripts/lang/custom"
 
 VOLUME "${DATADIR}"
 

@@ -102,7 +102,7 @@
                                     <ul class="dropdown-menu">
                                         <!-- User image -->
                                         <li class="user-header" style="background-color: #6441a5; height: auto;">
-                                            <img src="img/logo.png" class="img-circle">
+                                            <img src="img/logo.png" class="img-circle" id="user-image">
 
                                             <p class="panel-admin" id="second-name">
                                                 PhantomBot
@@ -526,14 +526,25 @@
                 $('body').append($('<script>', {
                     'src': 'https://' + helpers.getBotHost() + '/panel/js/utils/panelConfig.js'
                 }));
+                var panelTmrIterations = 0;
                 var panelTmr = setInterval(function () {
-                    if (panelSettings === undefined) {
-                        return;
+                    try {
+                        panelTmrIterations++;
+                        if (panelTmrIterations >= 60) {
+                            window.location = window.location.origin + window.location.pathname + 'login';
+                            clearInterval(panelTmr);
+                            return;
+                        }
+                        if (panelSettings === undefined) {
+                            return;
+                        }
+                        $('#user-image').attr('src', 'https://' + helpers.getBotHost() + '/panel/img/logo.png');
+                        $('body').append($('<script>', {
+                            'src': 'js/index.js'
+                        }));
+                        clearInterval(panelTmr);
+                    } catch (e) {
                     }
-                    $('body').append($('<script>', {
-                        'src': 'js/index.js'
-                    }));
-                    clearInterval(panelTmr);
                 }, 500);
             });
         </script>

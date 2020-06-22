@@ -77,15 +77,20 @@ jobs:
         mkdir dist/$FOLDERARM
         rsync -rav --progress dist/$FOLDERFULL dist/$FOLDERARM --exclude java-runtime-linux --exclude java-runtime --exclude java-runtime-macos --exclude launch.bat
         cd dist
-        zip -m -9 -X -r $FOLDERFULL $FOLDERFULL
-        mv $FOLDERLIN $FOLDERFULL
-        zip -m -9 -X -r $FOLDERLIN $FOLDERFULL
-        mv $FOLDERWIN $FOLDERFULL
-        zip -m -9 -X -r $FOLDERWIN $FOLDERFULL
-        mv $FOLDERMAC $FOLDERFULL
-        zip -m -9 -X -r $FOLDERMAC $FOLDERFULL
-        mv $FOLDERARM $FOLDERFULL
-        zip -m -9 -X -r $FOLDERARM $FOLDERFULL
+        echo Zip Full
+        zip -m -9 -X -r $FOLDERFULL.zip $FOLDERFULL
+        echo Zip Lin
+        mv -v $FOLDERLIN $FOLDERFULL
+        zip -m -9 -X -r $FOLDERLIN.zip $FOLDERFULL
+        echo Zip Win
+        mv -v $FOLDERWIN $FOLDERFULL
+        zip -m -9 -X -r $FOLDERWIN.zip $FOLDERFULL
+        echo Zip Mac
+        mv -v $FOLDERMAC $FOLDERFULL
+        zip -m -9 -X -r $FOLDERMAC.zip $FOLDERFULL
+        echo Zip Arm
+        mv -v $FOLDERARM $FOLDERFULL
+        zip -m -9 -X -r $FOLDERARM.zip $FOLDERFULL
     - name: Upload Asset (Full)
       uses: actions/upload-release-asset@v1
       env:
@@ -97,6 +102,8 @@ jobs:
         asset_content_type: application/zip
     - name: Upload Asset (Linux)
       uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: ${{ format('dist/PhantomBot-{0}-lin.zip', steps.build_env.outputs.version) }}
@@ -104,6 +111,8 @@ jobs:
         asset_content_type: application/zip
     - name: Upload Asset (Windows)
       uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: ${{ format('dist/PhantomBot-{0}-win.zip', steps.build_env.outputs.version) }}
@@ -111,6 +120,8 @@ jobs:
         asset_content_type: application/zip
     - name: Upload Asset (macOS)
       uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: ${{ format('dist/PhantomBot-{0}-mac.zip', steps.build_env.outputs.version) }}
@@ -118,6 +129,8 @@ jobs:
         asset_content_type: application/zip
     - name: Upload Asset (ARM)
       uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: ${{ format('dist/PhantomBot-{0}-arm.zip', steps.build_env.outputs.version) }}
